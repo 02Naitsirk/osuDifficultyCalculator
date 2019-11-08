@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -98,25 +98,26 @@ namespace osuDifficultyCalculator
         }
 
         /// Calculates the pp of a beatmap.
-        public double PP(double starRating, double overallDifficulty, double approachRate, double circleCount, string mod = null)
+        public double PP(double starRating, double overallDifficulty, double approachRate, double circleCount, string mod = "")
         {
-            switch (mod)
+            double standardPP = ppMultiplier * Math.Pow(starRating, ppExponent) * LengthBonus(circleCount);
+            if (!mod.Contains("DT")) // NM, HD, HR, HDHR
             {
-                case null:
-                case "HR":
-                    return ppMultiplier * Math.Pow(starRating, ppExponent) * OverallDifficultyBonus(overallDifficulty, false) * HighApproachRateBonus(approachRate, false) * LowApproachRateBonus(approachRate, false) * LengthBonus(circleCount);
-                case "DT":
-                case "DTHR":
-                    return ppMultiplier * Math.Pow(starRating, ppExponent) * OverallDifficultyBonus(overallDifficulty, true) * HighApproachRateBonus(approachRate, true) * LowApproachRateBonus(approachRate, true) * LengthBonus(circleCount);
-                case "HD":
-                case "HDHR":
-                    return ppMultiplier * Math.Pow(starRating, ppExponent) * OverallDifficultyBonus(overallDifficulty, false) * HighApproachRateBonus(approachRate, false) * LowApproachRateBonus(approachRate, false) * LengthBonus(circleCount) * HiddenBonus(approachRate, false);
-                case "DTHD":
-                case "DTHDHR":
-                    return ppMultiplier * Math.Pow(starRating, ppExponent) * OverallDifficultyBonus(overallDifficulty, true) * HighApproachRateBonus(approachRate, true) * LowApproachRateBonus(approachRate, true) * LengthBonus(circleCount) * HiddenBonus(approachRate, true);
-                default:
-                    return -1;
+                if (mod.Contains("HD"))
+                {
+                    standardPP *= HiddenBonus(approachRate, false);
+                }
+                return standardPP * OverallDifficultyBonus(overallDifficulty, false) * HighApproachRateBonus(approachRate, false) * LowApproachRateBonus(approachRate, false);
             }
+            if (mod.Contains("DT"))
+            {
+                if (mod.Contains("HD"))
+                {
+                    standardPP *= HiddenBonus(approachRate, true);
+                }
+                return standardPP * OverallDifficultyBonus(overallDifficulty, true) * HighApproachRateBonus(approachRate, true) * LowApproachRateBonus(approachRate, true);
+            }
+            else return -1;
         }
     }
 }
