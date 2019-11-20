@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.IO;
-using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace osuDifficultyCalculator
 {
@@ -14,7 +14,9 @@ namespace osuDifficultyCalculator
             {
                 Console.WriteLine("Beatmap: ");
                 string fileName = Console.ReadLine();
-                fileName = fileName.Replace("\"", "");
+                fileName = fileName.Replace(@"\", string.Empty);
+                fileName = fileName.Trim();
+                Console.WriteLine(fileName);
                 string line;
                 try
                 {
