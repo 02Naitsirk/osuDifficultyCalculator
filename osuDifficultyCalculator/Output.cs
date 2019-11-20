@@ -25,19 +25,19 @@ namespace osuDifficultyCalculator
                         {
                             if (line.Contains("Title:"))
                             {
-                                beatmap.title = line.Split(':')[1];
+                                beatmap.title = line.Split(new[] { ':' }, 2)[1];
                             }
                             if (line.Contains("Artist:"))
                             {
-                                beatmap.artist = line.Split(':')[1];
+                                beatmap.artist = line.Split(new[] { ':' }, 2)[1];
                             }
                             if (line.Contains("Creator:"))
                             {
-                                beatmap.creator = line.Split(':')[1];
+                                beatmap.creator = line.Split(new[] { ':' }, 2)[1];
                             }
                             if (line.Contains("Version:"))
                             {
-                                beatmap.version = line.Split(':')[1];
+                                beatmap.version = line.Split(new[] { ':' }, 2)[1];
                             }
                             if (line.Contains("CircleSize:"))
                             {
