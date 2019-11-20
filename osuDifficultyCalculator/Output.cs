@@ -14,8 +14,7 @@ namespace osuDifficultyCalculator
             {
                 Console.WriteLine("Beatmap: ");
                 string fileName = Console.ReadLine();
-                fileName = fileName.Replace(@"\", string.Empty);
-                fileName = fileName.Trim();
+                fileName = fileName.Replace(@"\", string.Empty).Trim();
                 Console.WriteLine(fileName);
                 string line;
                 try
