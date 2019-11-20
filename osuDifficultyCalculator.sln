@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osuDifficultyCalculator", "osuDifficultyCalculator\osuDifficultyCalculator.csproj", "{EE78CBD1-5856-4E8A-911A-43927CF1CEA8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE78CBD1-5856-4E8A-911A-43927CF1CEA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE78CBD1-5856-4E8A-911A-43927CF1CEA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE78CBD1-5856-4E8A-911A-43927CF1CEA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE78CBD1-5856-4E8A-911A-43927CF1CEA8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FD562A7E-AB05-4CF9-847E-56C98AB4C9F9}
+	EndGlobalSection
+EndGlobal
