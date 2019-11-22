@@ -14,28 +14,27 @@ Here are some interesting results:
 
 Map|SR|SS pp
 ---|---|---
-Camellia vs Akira Complex - Reality Distortion (rrtyui) [rrtyui x Sing's Transference] | 7.67* | 584.54pp
-Camellia - Exit This Earth's Atomosphere (rrtyui) [Evolution] | 7.94* | 636.46pp
-Culprate & Au5 - Impulse (handsome) [Master] | 7.75* | 612.47pp
-gmtn. (witch's slave) - furioso melodia (Alumetorz) [Wrath] | 7.62* | 661.96pp
-Grabbitz - Way Too Deep (UndeadCapulet) [Settling Down] | 8.36* | 829.44pp
-Halozy - Deconstruction Star (Hollow Wings) [Beat Heaven] | 8.47* | 800.18pp
-M2U - The back of Beyond (yaspo) [Spring] | 7.48* | 458.74pp
-sakuzyo - AXION (Flower) [AXION_REBORN] | 7.63* | 496.78pp
-Sota Fujimori - polygon (Kaifin) [Bonzi's Ultra] | 8.17* | 616.39pp 
-Squarepusher - Dark Steering (dsco) [Nuclear] | 7.81* | 692.63pp
+Camellia vs Akira Complex - Reality Distortion (rrtyui) [rrtyui x Sing's Transference] | 7.55* | 563pp
+Camellia - Exit This Earth's Atomosphere (rrtyui) [Evolution] | 7.78* | 607pp
+Culprate & Au5 - Impulse (handsome) [Master] | 7.15* | 503pp
+gmtn. (witch's slave) - furioso melodia (Alumetorz) [Wrath] | 7.6* | 656pp
+Grabbitz - Way Too Deep (UndeadCapulet) [Settling Down] | 7.94* | 733pp
+Halozy - Deconstruction Star (Hollow Wings) [Beat Heaven] | 8.14* | 726pp
+M2U - The back of Beyond (yaspo) [Spring] | 7.07* | 400pp
+sakuzyo - AXION (Flower) [AXION_REBORN] | 7.38* | 458pp
+Sota Fujimori - polygon (Kaifin) [Bonzi's Ultra] | 7.86* | 562pp
+Squarepusher - Dark Steering (dsco) [Nuclear] | 7.51* | 628pp
 
 The system nerfs some short or farmy maps:
 
 Map|SR|SS pp|DT SR|DT pp
 ---|---|---|---|---
-Will Stetson - Harumachi Clover (Swing Arrangement) (Will Stetson) [Fiery's Extreme] | 5.16* | 167.75pp | 7.19* | 417.80pp
-Nanahira - Chikatto Chika Chika (Agatsu) [Sotarks' 1+2 IQ] | 5.98* | 270.76pp | 8.35* | 676.73pp
-Will Stetson - Snow Halation (feat. BeasttrollMC) (Sotarks) [Nevo's Extra] | 5.44* | 207.84pp | 7.59* | 520.43pp
-Vickeblanka - Black Rover (TV Size) (Sotarks) [Extra] | 6.12* | 273.83pp | 8.59* | 711.32pp
-TWICE - CHEER UP (Sotarks) [SHY SHY SHY!] | 5.69* | 232.64pp | 7.95* | 593.01pp
-Parry Gripp - Guinea Pig Bridge (Sotarks) [Guinea Pig Technology] | 5.55* | 206.43pp | 7.75* | 521.87pp
-S3RL - Bass Slut (Original Mix) (Fatfan Kolek) [Taeyang's Trashy Extreme] | 5.90* | 260.76pp | 8.23* | 660.68pp
+Will Stetson - Harumachi Clover (Swing Arrangement) (Will Stetson) [Fiery's Extreme] | 5.12* | 164pp | 7.13* | 409pp
+Nanahira - Chikatto Chika Chika (Agatsu) [Sotarks' 1+2 IQ] | 5.93* | 266pp | 8.29* | 664pp
+Will Stetson - Snow Halation (feat. BeasttrollMC) (Sotarks) [Nevo's Extra] | 5.37* | 202pp | 7.49* | 505pp
+Vickeblanka - Black Rover (TV Size) (Sotarks) [Extra] | 6.07* | 268pp | 8.52* | 697pp
+Parry Gripp - Guinea Pig Bridge (Sotarks) [Guinea Pig Technology] | 5.50* | 202pp | 7.75* | 511pp
+
 
 # Download:
-* [Download .exe file.](https://naitsirk.s-ul.eu/6K6bQNyZ.exe)
+* [Download .exe file.](https://naitsirk.s-ul.eu/gVFF1Lp1.exe)
