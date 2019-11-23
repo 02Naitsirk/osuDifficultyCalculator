@@ -85,9 +85,9 @@ namespace osuDifficultyCalculator
                         beatmap.strains.Add(calculate.Strain(beatmap.distances[i], beatmap.timeDifferences[i]));
                         beatmap.DTstrains.Add(calculate.Strain(beatmap.distances[i], 2.0 / 3.0 * beatmap.timeDifferences[i]));
                     }
-                    for (int i = 0; i < beatmap.strains.Count; i++) /// Try to prevent SR from becoming extremely inflated by reducing some very high strains.
+                    for (int i = beatmap.strains.Count - 1; i > 0; i--) /// Try to prevent SR from becoming extremely inflated by reducing some very high strains.
                     {
-                        double proportion = (beatmap.strains[i] != 0 ? beatmap.strains[Math.Max(0, i - 1)] / beatmap.strains[i] : 0);
+                        double proportion = beatmap.strains[i] > 0 ? beatmap.strains[i - 1] / beatmap.strains[i] : 0;
                         if (proportion < 0.5)
                         {
                             beatmap.strains[i] *= (1 - 2 * Math.Pow(proportion - 0.5, 2));
