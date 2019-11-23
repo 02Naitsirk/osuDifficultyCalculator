@@ -6,7 +6,9 @@ All this does is calculate SR and pp. There's no code to calculate pp with a cer
 
 `pp = (SS pp) * ARCCOS(1 - 2 * ACCURACY) * SQRT(COMBO / MAX COMBO) * 0.95^(MISSES) / (PI * (2 - ACCURACY)).`
 
-Also, there's no EZ, you must manually adjust the .osu file. Simply divide the CS, AR, and OD by 2, and don't round.
+There's no EZ, you must manually adjust the .osu file. Simply divide the CS, AR, and OD by 2, and don't round.
+
+Finally, this system does not have an angle or speed buff.
 
 # Results
 Because this system is "strainless", you can expect difficulty spikes to be nerfed, because strain becomes high on difficulty spikes, and  consistent maps to be buffed.
