@@ -39,4 +39,4 @@ Parry Gripp - Guinea Pig Bridge (Sotarks) [Guinea Pig Technology] | 5.50* | 202p
 
 
 # Download:
-* [Download .exe file.](https://naitsirk.s-ul.eu/gVFF1Lp1.exe)
+* [Download .exe file.](https://naitsirk.s-ul.eu/hccNCvSS.exe)
