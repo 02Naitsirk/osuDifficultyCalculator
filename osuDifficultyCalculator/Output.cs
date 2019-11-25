@@ -82,25 +82,29 @@ namespace osuDifficultyCalculator
                     for (int i = 0; i < beatmap.objectTypes.Count; i++) /// Preparation to calculate star rating.
                     {
                         beatmap.distances.Add(calculate.Distance(beatmap.xCoordinates[i], beatmap.yCoordinates[i], beatmap.xCoordinates[Math.Max(0, i - 1)], beatmap.yCoordinates[Math.Max(0, i - 1)]));
-                        beatmap.timeDifferences.Add(Math.Max(50, beatmap.timeCoordinates[i] - beatmap.timeCoordinates[Math.Max(0, i - 1)]));
-                        beatmap.strains.Add(calculate.Strain(beatmap.distances[i], beatmap.timeDifferences[i]));
-                        beatmap.DTstrains.Add(calculate.Strain(beatmap.distances[i], 2.0 / 3.0 * beatmap.timeDifferences[i]));
+                        beatmap.timeDifferences.Add(Math.Max(1, beatmap.timeCoordinates[i] - beatmap.timeCoordinates[Math.Max(0, i - 1)]));
+                        beatmap.strains.Add(calculate.Strain(beatmap.distances[i], beatmap.timeDifferences[i]) * (1 + Math.Min(1, Math.Pow(beatmap.distances[i] / calculate.Diameter(beatmap.circleSize), 2)) * calculate.AngleBuff(calculate.Angle(beatmap.xCoordinates[Math.Max(0, i - 2)], beatmap.yCoordinates[Math.Max(0, i - 2)], beatmap.xCoordinates[Math.Max(0, i - 1)], beatmap.yCoordinates[Math.Max(0, i - 1)], beatmap.xCoordinates[i], beatmap.yCoordinates[i]), beatmap.timeDifferences[i], beatmap.timeDifferences[Math.Max(0, i - 1)])));
+                        beatmap.HRstrains.Add(calculate.Strain(beatmap.distances[i], beatmap.timeDifferences[i]) * (1 + Math.Min(1, Math.Pow(beatmap.distances[i] / calculate.Diameter(Math.Min(10, beatmap.circleSize * 1.3)), 2)) * calculate.AngleBuff(calculate.Angle(beatmap.xCoordinates[Math.Max(0, i - 2)], beatmap.yCoordinates[Math.Max(0, i - 2)], beatmap.xCoordinates[Math.Max(0, i - 1)], beatmap.yCoordinates[Math.Max(0, i - 1)], beatmap.xCoordinates[i], beatmap.yCoordinates[i]), beatmap.timeDifferences[i], beatmap.timeDifferences[Math.Max(0, i - 1)])));
+                        beatmap.DTstrains.Add(calculate.Strain(beatmap.distances[i], Math.Max(1, 2.0 / 3.0 * beatmap.timeDifferences[i])) * (1 + Math.Min(1, Math.Pow(beatmap.distances[i] / calculate.Diameter(beatmap.circleSize), 2)) * calculate.AngleBuff(calculate.Angle(beatmap.xCoordinates[Math.Max(0, i - 2)], beatmap.yCoordinates[Math.Max(0, i - 2)], beatmap.xCoordinates[Math.Max(0, i - 1)], beatmap.yCoordinates[Math.Max(0, i - 1)], beatmap.xCoordinates[i], beatmap.yCoordinates[i]), Math.Max(1, 2.0 / 3.0 * beatmap.timeDifferences[i]), Math.Max(1, 2.0 / 3.0 * beatmap.timeDifferences[Math.Max(0, i - 1)]))));
+                        beatmap.DTHRstrains.Add(calculate.Strain(beatmap.distances[i], Math.Max(1, 2.0 / 3.0 * beatmap.timeDifferences[i])) * (1 + Math.Min(1, Math.Pow(beatmap.distances[i] / calculate.Diameter(Math.Min(10, beatmap.circleSize * 1.3)), 2)) * calculate.AngleBuff(calculate.Angle(beatmap.xCoordinates[Math.Max(0, i - 2)], beatmap.yCoordinates[Math.Max(0, i - 2)], beatmap.xCoordinates[Math.Max(0, i - 1)], beatmap.yCoordinates[Math.Max(0, i - 1)], beatmap.xCoordinates[i], beatmap.yCoordinates[i]), Math.Max(1, 2.0 / 3.0 * beatmap.timeDifferences[i]), Math.Max(1, 2.0 / 3.0 * beatmap.timeDifferences[Math.Max(0, i - 1)]))));
                     }
                     for (int i = beatmap.strains.Count - 1; i > 0; i--) /// Try to prevent SR from becoming extremely inflated by reducing some very high strains.
                     {
-                        double proportion = beatmap.strains[i] > 0 ? beatmap.strains[i - 1] / beatmap.strains[i] : 0;
+                        double proportion = beatmap.strains[i] > 0 ? beatmap.strains[i - 1] / beatmap.strains[i] : double.PositiveInfinity;
                         if (proportion < 0.5)
                         {
-                            beatmap.strains[i] *= (1 - 2 * Math.Pow(proportion - 0.5, 2));
-                            beatmap.DTstrains[i] *= (1 - 2 * Math.Pow(proportion - 0.5, 2));
+                            beatmap.strains[i] *= 1 - 4 * Math.Pow(proportion - 0.5, 2);
+                            beatmap.HRstrains[i] *= 1 - 4 * Math.Pow(proportion - 0.5, 2);
+                            beatmap.DTstrains[i] *= 1 - 4 * Math.Pow(proportion - 0.5, 2);
+                            beatmap.DTHRstrains[i] *= 1 - 4 * Math.Pow(proportion - 0.5, 2);
                         }
                     }
 
                     /// Calculates star rating and pp.
                     beatmap.starRating = calculate.StarRating(beatmap.strains, beatmap.circleSize);
-                    beatmap.HRstarRating = calculate.StarRating(beatmap.strains, Math.Min(10, beatmap.circleSize * 1.3));
+                    beatmap.HRstarRating = calculate.StarRating(beatmap.HRstrains, Math.Min(10, beatmap.circleSize * 1.3));
                     beatmap.DTstarRating = calculate.StarRating(beatmap.DTstrains, beatmap.circleSize);
-                    beatmap.DTHRstarRating = calculate.StarRating(beatmap.DTstrains, Math.Min(10, beatmap.circleSize * 1.3));
+                    beatmap.DTHRstarRating = calculate.StarRating(beatmap.DTHRstrains, Math.Min(10, beatmap.circleSize * 1.3));
 
                     beatmap.nmPP = calculate.PP(beatmap.starRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount);
                     beatmap.hdPP = calculate.PP(beatmap.starRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, "HD");
@@ -127,7 +131,9 @@ namespace osuDifficultyCalculator
                     beatmap.timeCoordinates.Clear();
                     beatmap.objectTypes.Clear();
                     beatmap.strains.Clear();
+                    beatmap.HRstrains.Clear();
                     beatmap.DTstrains.Clear();
+                    beatmap.DTHRstrains.Clear();
                     beatmap.distances.Clear();
                     beatmap.timeDifferences.Clear();
                     beatmap.circleCount = 0;
