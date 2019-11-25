@@ -80,6 +80,7 @@ namespace osuDifficultyCalculator
             return Math.Sqrt(Math.Pow(previousX - currentX, 2) + Math.Pow(previousY - currentY, 2));
         }
 
+        /// Calculates the angle between 3 notes. Return NaN if the angle does not exist.
         public double Angle(int previousPreviousX, int previousPreviousY, int previousX, int previousY, int currentX, int currentY)
         {
             double previousPreviousToPrevious = Distance(previousPreviousX, previousPreviousY, previousX, previousY);
@@ -88,12 +89,13 @@ namespace osuDifficultyCalculator
             return previousToCurrent * previousPreviousToPrevious > 0 ? Math.Acos((Math.Pow(previousPreviousToPrevious, 2) + Math.Pow(previousToCurrent, 2) - Math.Pow(previousPreviousToCurrent, 2)) / (2 * previousToCurrent * previousPreviousToPrevious)) : double.NaN;
         }
 
+        /// Buff low-bpm linear patterns and high-bpm snappy patterns.
         public double AngleBuff(double angle, double timeDifference, double previousTimeDifference)
         {
-            double timePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference));
-            double slowAngleBuff = ((1 - Math.Pow(2, 9 - (Math.Max(90, timeDifference) / 10))) * Math.Pow(Math.Sin(angle / 2), 2)) + 1;
-            double fastAngleBuff = ((1 - Math.Pow(2, (Math.Min(100, timeDifference) / 10) - 10)) * Math.Pow(Math.Cos(angle / 2), 2)) + 1;
-            return double.IsNaN(angle) ? 0 : (timePunishment * ((slowAngleBuff * fastAngleBuff) - 1) / 2);
+            double timeDifferencePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference)); /// If the time difference between the last 3 notes varies significantly, reduce the angle buff.
+            double slowAngleBuff = ((1 - Math.Pow(2, 9 - (Math.Max(90, timeDifference) / 10))) * Math.Pow(Math.Sin(angle / 2), 2)) + 1; /// Low BPM angle buff.
+            double fastAngleBuff = ((1 - Math.Pow(2, (Math.Min(100, timeDifference) / 10) - 10)) * Math.Pow(Math.Cos(angle / 2), 2)) + 1; /// High BPM angle buff.
+            return double.IsNaN(angle) ? 0 : (timeDifferencePunishment * ((slowAngleBuff * fastAngleBuff) - 1) / 2);
         }
 
         /// Calculates the strain of a particular note.
