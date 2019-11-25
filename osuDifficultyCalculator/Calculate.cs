@@ -7,13 +7,13 @@ namespace osuDifficultyCalculator
     public class Calculate
     {
         private const double consistencyMultiplier = 0.98;
-        private const double starRatingMultiplier = 54;
+        private const double starRatingMultiplier = 53.5;
         private const double starRatingExponent = 0.34;
         private const double ppMultiplier = 1.50;
         private const double ppExponent = 2.43;
 
         /// Converts the circle size to its corresponding diameter.
-        private double Diameter(double circleSize)
+        public double Diameter(double circleSize)
         {
             return 2 * (54.41 - 4.48 * circleSize);
         }
@@ -75,9 +75,25 @@ namespace osuDifficultyCalculator
         }
 
         /// Calculates the distance between two notes.
-        public double Distance(int x2, int y2, int x1, int y1)
+        public double Distance(int previousX, int previousY, int currentX, int currentY)
         {
-            return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
+            return Math.Sqrt(Math.Pow(previousX - currentX, 2) + Math.Pow(previousY - currentY, 2));
+        }
+
+        public double Angle(int previousPreviousX, int previousPreviousY, int previousX, int previousY, int currentX, int currentY)
+        {
+            double previousPreviousToPrevious = Distance(previousPreviousX, previousPreviousY, previousX, previousY);
+            double previousToCurrent = Distance(previousX, previousY, currentX, currentY);
+            double previousPreviousToCurrent = Distance(previousPreviousX, previousPreviousY, currentX, currentY);
+            return previousToCurrent * previousPreviousToPrevious > 0 ? Math.Acos((Math.Pow(previousPreviousToPrevious, 2) + Math.Pow(previousToCurrent, 2) - Math.Pow(previousPreviousToCurrent, 2)) / (2 * previousToCurrent * previousPreviousToPrevious)) : double.NaN;
+        }
+
+        public double AngleBuff(double angle, double timeDifference, double previousTimeDifference)
+        {
+            double timePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference));
+            double slowAngleBuff = ((1 - Math.Pow(2, 9 - (Math.Max(90, timeDifference) / 10))) * Math.Pow(Math.Sin(angle / 2), 2)) + 1;
+            double fastAngleBuff = ((1 - Math.Pow(2, (Math.Min(100, timeDifference) / 10) - 10)) * Math.Pow(Math.Cos(angle / 2), 2)) + 1;
+            return double.IsNaN(angle) ? 0 : (timePunishment * ((slowAngleBuff * fastAngleBuff) - 1) / 2);
         }
 
         /// Calculates the strain of a particular note.
@@ -117,7 +133,7 @@ namespace osuDifficultyCalculator
                 }
                 return standardPP * OverallDifficultyBonus(overallDifficulty, true) * HighApproachRateBonus(approachRate, true) * LowApproachRateBonus(approachRate, true);
             }
-            else return -1;
+            return -1;
         }
     }
 }
