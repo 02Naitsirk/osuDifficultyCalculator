@@ -7,7 +7,7 @@ namespace osuDifficultyCalculator
     public class Calculate
     {
         private const double consistencyMultiplier = 0.98;
-        private const double starRatingMultiplier = 53.5;
+        private const double starRatingMultiplier = 53;
         private const double starRatingExponent = 0.34;
         private const double ppMultiplier = 1.50;
         private const double ppExponent = 2.43;
@@ -29,16 +29,12 @@ namespace osuDifficultyCalculator
         public double FlashlightBonus(List<double> distances, List<double> times, bool doubleTime = false)
         {
             double flBonus = 0;
+            int flRadius = 168;
             for (int i = 0; i < distances.Count; i++)
             {
-                if (!doubleTime)
-                {
-                    flBonus += Math.Sqrt(distances[i] / times[i]);
-                }
-                else
-                {
-                    flBonus += Math.Sqrt(1.5 * distances[i] / times[i]);
-                }
+                if (i >= 100 && i < 200) flRadius = 136; /// In reality, the flashlight radius shrinks at 100 and 200 combo, but we shrink it here at the 100th and 200th object.
+                if (i > 200) flRadius = 105;
+                flBonus += Math.Sqrt((doubleTime ? 1.5 : 1) * distances[i] / times[i]) * Math.Min(1, distances[i] / flRadius);
             }
             return Math.Pow(1 + Math.Sqrt(flBonus) / 125, 2);
         }
@@ -84,8 +80,8 @@ namespace osuDifficultyCalculator
         public double Angle(int previousPreviousX, int previousPreviousY, int previousX, int previousY, int currentX, int currentY)
         {
             double previousPreviousToPrevious = Distance(previousPreviousX, previousPreviousY, previousX, previousY);
-            double previousToCurrent = Distance(previousX, previousY, currentX, currentY);
             double previousPreviousToCurrent = Distance(previousPreviousX, previousPreviousY, currentX, currentY);
+            double previousToCurrent = Distance(previousX, previousY, currentX, currentY);
             return previousToCurrent * previousPreviousToPrevious > 0 ? Math.Acos((Math.Pow(previousPreviousToPrevious, 2) + Math.Pow(previousToCurrent, 2) - Math.Pow(previousPreviousToCurrent, 2)) / (2 * previousToCurrent * previousPreviousToPrevious)) : double.NaN;
         }
 
@@ -93,9 +89,9 @@ namespace osuDifficultyCalculator
         public double AngleBuff(double angle, double timeDifference, double previousTimeDifference)
         {
             double timeDifferencePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference)); /// If the time difference between the last 3 notes varies significantly, reduce the angle buff.
-            double slowAngleBuff = ((1 - Math.Pow(2, 9 - (Math.Max(90, timeDifference) / 10))) * Math.Pow(Math.Sin(angle / 2), 2)) + 1; /// Low BPM angle buff.
-            double fastAngleBuff = ((1 - Math.Pow(2, (Math.Min(100, timeDifference) / 10) - 10)) * Math.Pow(Math.Cos(angle / 2), 2)) + 1; /// High BPM angle buff.
-            return double.IsNaN(angle) ? 0 : (timeDifferencePunishment * ((slowAngleBuff * fastAngleBuff) - 1) / 2);
+            double slowAngleBuff = (1 - Math.Pow(2, 9 - Math.Max(90, timeDifference) / 10)) * Math.Pow(Math.Sin(angle / 2), 2) + 1; /// Low BPM angle buff.
+            double fastAngleBuff = (1 - Math.Pow(2, Math.Min(100, timeDifference) / 10 - 10)) * Math.Pow(Math.Cos(angle / 2), 2) + 1; /// High BPM angle buff.
+            return double.IsNaN(angle) ? 0 : timeDifferencePunishment * (slowAngleBuff * fastAngleBuff - 1) / 1.5;
         }
 
         /// Calculates the strain of a particular note.
