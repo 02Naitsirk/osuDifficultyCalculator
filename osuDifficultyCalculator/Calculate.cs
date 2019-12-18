@@ -90,7 +90,7 @@ namespace osuDifficultyCalculator
         {
             double timeDifferencePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference)); /// If the time difference between the last 3 notes varies significantly, reduce the angle buff.
             double slowAngleBuff = (1 - Math.Pow(2, 9 - Math.Max(90, timeDifference) / 10)) * Math.Pow(Math.Sin(angle / 2), 2) + 1; /// Low BPM angle buff.
-            double fastAngleBuff = (1 - Math.Pow(2, Math.Min(100, timeDifference) / 10 - 10)) * Math.Pow(Math.Cos(angle / 2), 2) + 1; /// High BPM angle buff.
+            double fastAngleBuff = (1 - Math.Pow(2, Math.Min(90, timeDifference) / 10 - 9)) * Math.Pow(Math.Cos(angle / 2), 2) + 1; /// High BPM angle buff.
             return double.IsNaN(angle) ? 0 : timeDifferencePunishment * (slowAngleBuff * fastAngleBuff - 1) / 1.5;
         }
 
