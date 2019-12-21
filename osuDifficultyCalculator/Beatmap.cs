@@ -86,14 +86,14 @@ namespace osuDifficultyCalculator
                             int time = Convert.ToInt32(line.Split(',')[2]);
                             int objectType = Convert.ToInt32(line.Split(',')[3]);
                             Note note = new Note(xCoordinate, yCoordinate, time, objectType);
-                            if (note.objectType == 1 || note.objectType == 5)
-                            {
-                                circleCount++;
-                            }
                             if (note.objectType != 12)
                             {
                                 objectCount++;
                                 osuNotes.Add(note);
+                                if (!line.Contains('|'))
+                                {
+                                    circleCount++;
+                                }
                             }
                         }
                     }
