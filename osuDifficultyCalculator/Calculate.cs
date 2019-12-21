@@ -231,7 +231,7 @@ namespace osuDifficultyCalculator
                 }
                 basePP *= OverallDifficultyBonus(overallDifficulty, 0) * HighApproachRateBonus(approachRate, 0) * LowApproachRateBonus(approachRate, 0);
             }
-            return basePP;
+            return Math.Round(basePP, 2);
         }
     }
 }
