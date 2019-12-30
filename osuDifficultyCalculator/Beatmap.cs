@@ -32,7 +32,7 @@ namespace osuDifficultyCalculator
         public struct Note
         {
             public int xCoordinate, yCoordinate, time, objectType;
-            public Note (int x, int y, int t, int o)
+            public Note(int x, int y, int t, int o)
             {
                 xCoordinate = x;
                 yCoordinate = y;
@@ -44,56 +44,54 @@ namespace osuDifficultyCalculator
         public void GetBeatmapData(string fileName)
         {
             string line;
-            using (StreamReader file = new StreamReader(fileName))
+            using StreamReader file = new StreamReader(fileName);
+            while ((line = file.ReadLine()) != null)
             {
-                while ((line = file.ReadLine()) != null)
+                if (line.Contains("Title:"))
                 {
-                    if (line.Contains("Title:"))
+                    title = line.Split(new[] { ':' }, 2)[1];
+                }
+                if (line.Contains("Artist:"))
+                {
+                    artist = line.Split(new[] { ':' }, 2)[1];
+                }
+                if (line.Contains("Creator:"))
+                {
+                    creator = line.Split(new[] { ':' }, 2)[1];
+                }
+                if (line.Contains("Version:"))
+                {
+                    version = line.Split(new[] { ':' }, 2)[1];
+                }
+                if (line.Contains("CircleSize:"))
+                {
+                    circleSize = Convert.ToDouble(line.Split(':')[1]);
+                }
+                if (line.Contains("OverallDifficulty:"))
+                {
+                    overallDifficulty = Convert.ToDouble(line.Split(':')[1]);
+                    approachRate = overallDifficulty;
+                }
+                if (line.Contains("ApproachRate:"))
+                {
+                    approachRate = Convert.ToDouble(line.Split(':')[1]);
+                }
+                if (line.Contains("[HitObjects]"))
+                {
+                    while ((line = file.ReadLine()) != null)
                     {
-                        title = line.Split(new[] { ':' }, 2)[1];
-                    }
-                    if (line.Contains("Artist:"))
-                    {
-                        artist = line.Split(new[] { ':' }, 2)[1];
-                    }
-                    if (line.Contains("Creator:"))
-                    {
-                        creator = line.Split(new[] { ':' }, 2)[1];
-                    }
-                    if (line.Contains("Version:"))
-                    {
-                        version = line.Split(new[] { ':' }, 2)[1];
-                    }
-                    if (line.Contains("CircleSize:"))
-                    {
-                        circleSize = Convert.ToDouble(line.Split(':')[1]);
-                    }
-                    if (line.Contains("OverallDifficulty:"))
-                    {
-                        overallDifficulty = Convert.ToDouble(line.Split(':')[1]);
-                        approachRate = overallDifficulty;
-                    }
-                    if (line.Contains("ApproachRate:"))
-                    {
-                        approachRate = Convert.ToDouble(line.Split(':')[1]);
-                    }
-                    if (line.Contains("[HitObjects]"))
-                    {
-                        while ((line = file.ReadLine()) != null)
+                        int xCoordinate = Convert.ToInt32(line.Split(',')[0]);
+                        int yCoordinate = Convert.ToInt32(line.Split(',')[1]);
+                        int time = Convert.ToInt32(line.Split(',')[2]);
+                        int objectType = Convert.ToInt32(line.Split(',')[3]);
+                        Note note = new Note(xCoordinate, yCoordinate, time, objectType);
+                        if (note.objectType != 12)
                         {
-                            int xCoordinate = Convert.ToInt32(line.Split(',')[0]);
-                            int yCoordinate = Convert.ToInt32(line.Split(',')[1]);
-                            int time = Convert.ToInt32(line.Split(',')[2]);
-                            int objectType = Convert.ToInt32(line.Split(',')[3]);
-                            Note note = new Note(xCoordinate, yCoordinate, time, objectType);
-                            if (note.objectType != 12)
+                            objectCount++;
+                            osuNotes.Add(note);
+                            if (!line.Contains('|'))
                             {
-                                objectCount++;
-                                osuNotes.Add(note);
-                                if (!line.Contains('|'))
-                                {
-                                    circleCount++;
-                                }
+                                circleCount++;
                             }
                         }
                     }
