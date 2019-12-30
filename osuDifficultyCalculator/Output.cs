@@ -16,26 +16,26 @@ namespace osuDifficultyCalculator
                 {
                     beatmap.GetBeatmapData(fileName);
 
-                    /// Preparation to Calculate star rating.
-                    for (int i = 0; i < beatmap.osuNotes.Count; i++)
+                    /// Calculate difficulty for every note. Starts at the second note.
+                    for (int i = 1; i < beatmap.osuNotes.Count; i++)
                     {
-                        double ezOverlap = Distance(beatmap.osuNotes[i], beatmap.osuNotes[Math.Max(0, i - 1)]) / Diameter(beatmap.circleSize / 2);
+                        double ezOverlap = Distance(beatmap.osuNotes[i], beatmap.osuNotes[i - 1]) / Diameter(beatmap.circleSize / 2);
                         double ezOverlapPunishment = Math.Min(1, Math.Pow(ezOverlap / (2 - ezOverlap), 2));
 
-                        double nmOverlap = Distance(beatmap.osuNotes[i], beatmap.osuNotes[Math.Max(0, i - 1)]) / Diameter(beatmap.circleSize);
+                        double nmOverlap = Distance(beatmap.osuNotes[i], beatmap.osuNotes[i - 1]) / Diameter(beatmap.circleSize);
                         double nmOverlapPunishment = Math.Min(1, Math.Pow(nmOverlap / (2 - nmOverlap), 2));
 
-                        double hrOverlap = Distance(beatmap.osuNotes[i], beatmap.osuNotes[Math.Max(0, i - 1)]) / Diameter(Math.Min(10, beatmap.circleSize * 1.3));
+                        double hrOverlap = Distance(beatmap.osuNotes[i], beatmap.osuNotes[i - 1]) / Diameter(Math.Min(10, beatmap.circleSize * 1.3));
                         double hrOverlapPunishment = Math.Min(1, Math.Pow(hrOverlap / (2 - hrOverlap), 2));
 
-                        double angle = Angle(beatmap.osuNotes[Math.Max(0, i - 2)], beatmap.osuNotes[Math.Max(0, i - 1)], beatmap.osuNotes[i]);
+                        double angle = Angle(beatmap.osuNotes[Math.Max(0, i - 2)], beatmap.osuNotes[i - 1], beatmap.osuNotes[i]);
 
-                        double htDifficulty = Difficulty(beatmap.osuNotes[Math.Max(0, i - 1)], beatmap.osuNotes[i], -1);
-                        double nmDifficulty = Difficulty(beatmap.osuNotes[Math.Max(0, i - 1)], beatmap.osuNotes[i], 0);
-                        double dtDifficulty = Difficulty(beatmap.osuNotes[Math.Max(0, i - 1)], beatmap.osuNotes[i], 1);
+                        double htDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], -1);
+                        double nmDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], 0);
+                        double dtDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], 1);
 
-                        int timeDifference = Math.Max(minimumTime, beatmap.osuNotes[i].time - beatmap.osuNotes[Math.Max(0, i - 1)].time);
-                        int previousTimeDifference = Math.Max(minimumTime, beatmap.osuNotes[Math.Max(0, i - 1)].time - beatmap.osuNotes[Math.Max(0, i - 2)].time);
+                        int timeDifference = Math.Max(minimumTime, beatmap.osuNotes[i].time - beatmap.osuNotes[i - 1].time);
+                        int previousTimeDifference = Math.Max(minimumTime, beatmap.osuNotes[i - 1].time - beatmap.osuNotes[Math.Max(0, i - 2)].time);
 
                         beatmap.ezhtDifficulties.Add(htDifficulty * (1 + ezOverlapPunishment * AngleBuff(angle, timeDifference / 0.75, previousTimeDifference / 0.75)));
                         beatmap.nmhtDifficulties.Add(htDifficulty * (1 + nmOverlapPunishment * AngleBuff(angle, timeDifference / 0.75, previousTimeDifference / 0.75)));
@@ -179,7 +179,7 @@ namespace osuDifficultyCalculator
                 /// In case of invalid input.
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"\n{ex.Message.ToString()}\n", Console.ForegroundColor = ConsoleColor.Red);
+                    Console.WriteLine($"\n{ex.ToString()}\n", Console.ForegroundColor = ConsoleColor.Red);
                     Console.ResetColor();
                 }
             }
