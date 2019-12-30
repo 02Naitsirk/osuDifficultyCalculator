@@ -12,6 +12,7 @@ namespace osuDifficultyCalculator
         private const double starRatingExponent = 0.34;
         private const double ppMultiplier = 1.50;
         private const double ppExponent = 2.43;
+        public const int minimumTime = 40;
 
         public enum Mods
         {
@@ -31,9 +32,35 @@ namespace osuDifficultyCalculator
 
         /// A multiplicative pp bonus when the FL mod is enabled. The bonus increases as the object count increases.
         /// Minimum bonus is 1.0 at AR 10 or less. Maximum bonus is unbounded.
-        private static double FlashlightBonus(int objectCount)
+        private static double FlashlightBonus(List<Note> beatmapObjects, int speedUpMod)
         {
-            return 1 + Math.Sqrt(objectCount / 2500.0);
+            double flBonus = 0;
+            double timeDistanceRatio;
+            switch (speedUpMod)
+            {
+                case 1:  /// DT
+                    for (int i = 0; i < beatmapObjects.Count; ++i)
+                    {
+                        timeDistanceRatio = 1.5 * Distance(beatmapObjects[Math.Max(0, i - 1)], beatmapObjects[i]) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[Math.Max(0, i - 1)].time);
+                        flBonus += timeDistanceRatio;
+                    }
+                    break;
+                case 0:  /// NM
+                    for (int i = 0; i < beatmapObjects.Count; ++i)
+                    {
+                        timeDistanceRatio = Distance(beatmapObjects[Math.Max(0, i - 1)], beatmapObjects[i]) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[Math.Max(0, i - 1)].time);
+                        flBonus += timeDistanceRatio;
+                    }
+                    break;
+                case -1: /// HT
+                    for (int i = 0; i < beatmapObjects.Count; ++i)
+                    {
+                        timeDistanceRatio = 0.75 * Distance(beatmapObjects[Math.Max(0, i - 1)], beatmapObjects[i]) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[Math.Max(0, i - 1)].time);
+                        flBonus += timeDistanceRatio;
+                    }
+                    break;
+            }
+            return Math.Pow(1 + Math.Sqrt(flBonus) / 125, 2);
         }
 
         /// A multiplicative pp antibonus for hidden when the DT mod is enabled. The bonus decreases as the approach rate increases.
@@ -56,7 +83,7 @@ namespace osuDifficultyCalculator
                     approachTime = double.NaN;
                     break;
             }
-            return 1.1 - 0.1 * Math.Pow((450 - Math.Min(approachTime, 450)) / 150, 2);
+            return 1.1 - 0.08 * Math.Pow(3 - Math.Min(approachTime, 450) / 150, 2);
         }
 
         /// A multiplicative pp bonus for high AR when the DT mod is enabled. The bonus increases as the approach rate increases.
@@ -147,15 +174,16 @@ namespace osuDifficultyCalculator
             double previousToPreviousPrevious = Distance(previous, previousPrevious);
             double currentToPreviousPrevious = Distance(current, previousPrevious);
             double currentToPrevious = Distance(current, previous);
-            return currentToPrevious * previousToPreviousPrevious > 0 ? 
-                Math.Acos((Math.Pow(previousToPreviousPrevious, 2) + Math.Pow(currentToPrevious, 2) - Math.Pow(currentToPreviousPrevious, 2)) / (2 * currentToPrevious * previousToPreviousPrevious)) : double.NaN;
+            return currentToPrevious * previousToPreviousPrevious > 0
+                ? Math.Acos((Math.Pow(previousToPreviousPrevious, 2) + Math.Pow(currentToPrevious, 2) - Math.Pow(currentToPreviousPrevious, 2)) / (2 * currentToPrevious * previousToPreviousPrevious))
+                : double.NaN;
         }
 
         /// Buff low-bpm linear patterns and high-bpm snappy patterns.
         public static double AngleBuff(double angle, double timeDifference, double previousTimeDifference)
         {
-            timeDifference = Math.Max(40, timeDifference);
-            previousTimeDifference = Math.Max(40, previousTimeDifference);
+            timeDifference = Math.Max(minimumTime, timeDifference);
+            previousTimeDifference = Math.Max(minimumTime, previousTimeDifference);
             double timeDifferencePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference)); /// If the time difference between the last 3 notes varies significantly, reduce the angle buff.
             double slowAngleBuff = (1 - Math.Pow(2, 9 - Math.Max(90, timeDifference) / 10)) * Math.Pow(Math.Sin(angle / 2), 2) + 1; /// Low BPM angle buff.
             double fastAngleBuff = (1 - Math.Pow(2, Math.Min(90, timeDifference) / 10 - 9)) * Math.Pow(Math.Cos(angle / 2), 2) + 1; /// High BPM angle buff.
@@ -168,11 +196,11 @@ namespace osuDifficultyCalculator
             switch (speedUpMod)
             {
                 case 1:
-                    return (100 * Distance(current, previous) + Distance(current, previous) * (Math.Max(40, (current.time - previous.time) / 1.5))) / Math.Pow(Math.Max(40, (current.time - previous.time) / 1.5), 3);
+                    return (100 * Distance(current, previous) + Distance(current, previous) * Math.Max(minimumTime, (current.time - previous.time) / 1.5)) / Math.Pow(Math.Max(minimumTime, (current.time - previous.time) / 1.5), 3);
                 case 0:
-                    return (100 * Distance(current, previous) + Distance(current, previous) * (Math.Max(40, current.time - previous.time))) / Math.Pow(Math.Max(40, current.time - previous.time), 3);
+                    return (100 * Distance(current, previous) + Distance(current, previous) * Math.Max(minimumTime, current.time - previous.time)) / Math.Pow(Math.Max(minimumTime, current.time - previous.time), 3);
                 case -1:
-                    return (100 * Distance(current, previous) + Distance(current, previous) * (Math.Max(40, (current.time - previous.time) / 0.75))) / Math.Pow(Math.Max(40, (current.time - previous.time) / 0.75), 3);
+                    return (100 * Distance(current, previous) + Distance(current, previous) * Math.Max(minimumTime, (current.time - previous.time) / 0.75)) / Math.Pow(Math.Max(minimumTime, (current.time - previous.time) / 0.75), 3);
                 default:
                     return double.NaN;
             }
@@ -190,7 +218,7 @@ namespace osuDifficultyCalculator
         }
 
         /// Calculates the pp of a beatmap.
-        public static double PP(double starRating, double overallDifficulty, double approachRate, int circleCount, int objectCount, int modEnum = 17)
+        public static double PP(double starRating, double overallDifficulty, double approachRate, int circleCount, List<Note> osuNotes = null, int modEnum = 17)
         {
             double basePP = ppMultiplier * Math.Pow(starRating, ppExponent) * LengthBonus(circleCount);
             if (modEnum % (int)Mods.EZ == 0)
@@ -203,15 +231,15 @@ namespace osuDifficultyCalculator
                 overallDifficulty = Math.Min(10, overallDifficulty * 1.4);
                 approachRate = Math.Min(10, approachRate * 1.4);
             }
-            if (modEnum % (int)Mods.FL == 0)
-            {
-                basePP *= FlashlightBonus(objectCount);
-            }
             if (modEnum % (int)Mods.DT == 0)
             {
                 if (modEnum % (int)Mods.HD == 0)
                 {
                     basePP *= HiddenBonus(approachRate, 1);
+                }
+                if (modEnum % (int)Mods.FL == 0)
+                {
+                    basePP *= FlashlightBonus(osuNotes, 1);
                 }
                 basePP *= OverallDifficultyBonus(overallDifficulty, 1) * HighApproachRateBonus(approachRate, 1) * LowApproachRateBonus(approachRate, 1);
             }
@@ -221,6 +249,10 @@ namespace osuDifficultyCalculator
                 {
                     basePP *= HiddenBonus(approachRate, -1);
                 }
+                if (modEnum % (int)Mods.FL == 0)
+                {
+                    basePP *= FlashlightBonus(osuNotes, -1);
+                }
                 basePP *= OverallDifficultyBonus(overallDifficulty, -1) * HighApproachRateBonus(approachRate, -1) * LowApproachRateBonus(approachRate, -1);
             }
             if (modEnum % (int)Mods.DT != 0 && modEnum % (int)Mods.HT != 0)
@@ -228,6 +260,10 @@ namespace osuDifficultyCalculator
                 if (modEnum % (int)Mods.HD == 0)
                 {
                     basePP *= HiddenBonus(approachRate, 0);
+                }
+                if (modEnum % (int)Mods.FL == 0)
+                {
+                    basePP *= FlashlightBonus(osuNotes, 0);
                 }
                 basePP *= OverallDifficultyBonus(overallDifficulty, 0) * HighApproachRateBonus(approachRate, 0) * LowApproachRateBonus(approachRate, 0);
             }
