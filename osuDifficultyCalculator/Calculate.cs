@@ -39,23 +39,23 @@ namespace osuDifficultyCalculator
             switch (speedUpMod)
             {
                 case 1:  /// DT
-                    for (int i = 0; i < beatmapObjects.Count; ++i)
+                    for (int i = 1; i < beatmapObjects.Count; ++i)
                     {
-                        timeDistanceRatio = 1.5 * Distance(beatmapObjects[Math.Max(0, i - 1)], beatmapObjects[i]) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[Math.Max(0, i - 1)].time);
+                        timeDistanceRatio = 1.5 * Distance(beatmapObjects[i - 1], beatmapObjects[i]) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[i - 1].time);
                         flBonus += timeDistanceRatio;
                     }
                     break;
                 case 0:  /// NM
-                    for (int i = 0; i < beatmapObjects.Count; ++i)
+                    for (int i = 1; i < beatmapObjects.Count; ++i)
                     {
-                        timeDistanceRatio = Distance(beatmapObjects[Math.Max(0, i - 1)], beatmapObjects[i]) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[Math.Max(0, i - 1)].time);
+                        timeDistanceRatio = Distance(beatmapObjects[i - 1], beatmapObjects[i]) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[i - 1].time);
                         flBonus += timeDistanceRatio;
                     }
                     break;
                 case -1: /// HT
-                    for (int i = 0; i < beatmapObjects.Count; ++i)
+                    for (int i = 1; i < beatmapObjects.Count; ++i)
                     {
-                        timeDistanceRatio = 0.75 * Distance(beatmapObjects[Math.Max(0, i - 1)], beatmapObjects[i]) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[Math.Max(0, i - 1)].time);
+                        timeDistanceRatio = 0.75 * Distance(beatmapObjects[i - 1], beatmapObjects[i]) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[i - 1].time);
                         flBonus += timeDistanceRatio;
                     }
                     break;
