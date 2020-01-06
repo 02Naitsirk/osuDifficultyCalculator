@@ -8,11 +8,12 @@ namespace osuDifficultyCalculator
     public static class Calculate
     {
         private const double consistencyMultiplier = 0.98;
-        private const double starRatingMultiplier = 53;
+        private const double starRatingMultiplier = 53.0;
         private const double starRatingExponent = 0.34;
         private const double ppMultiplier = 1.50;
         private const double ppExponent = 2.43;
-        public const int minimumTime = 40;
+        public const double minimumTime = 37.5;
+        public static double htSpeedDifficulty, nmSpeedDifficulty, dtSpeedDifficulty;
 
         public enum Mods
         {
@@ -186,21 +187,28 @@ namespace osuDifficultyCalculator
             previousTimeDifference = Math.Max(minimumTime, previousTimeDifference);
             double timeDifferencePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference)); /// If the time difference between the last 3 notes varies significantly, reduce the angle buff.
             double slowAngleBuff = (1 - Math.Pow(2, 9 - Math.Max(90, timeDifference) / 10)) * Math.Pow(Math.Sin(angle / 2), 2) + 1; /// Low BPM angle buff.
-            double fastAngleBuff = (1 - Math.Pow(2, Math.Min(90, timeDifference) / 10 - 9)) * Math.Pow(Math.Cos(angle / 2), 2) + 1; /// High BPM angle buff.
+            double fastAngleBuff = (1 - Math.Pow(4, Math.Min(90, timeDifference) / 10 - 9)) * Math.Pow(Math.Cos(angle / 2), 2) + 1; /// High BPM angle buff.
             return double.IsNaN(angle) ? 0 : timeDifferencePunishment * (slowAngleBuff * fastAngleBuff - 1) / 1.5;
         }
 
         /// Calculates the difficulty of a particular note.
         public static double Difficulty(Note previous, Note current, int speedUpMod)
         {
+            double currentDistance = Distance(current, previous);
             switch (speedUpMod)
             {
-                case 1:
-                    return (100 * Distance(current, previous) + Distance(current, previous) * Math.Max(minimumTime, (current.time - previous.time) / 1.5)) / Math.Pow(Math.Max(minimumTime, (current.time - previous.time) / 1.5), 3);
-                case 0:
-                    return (100 * Distance(current, previous) + Distance(current, previous) * Math.Max(minimumTime, current.time - previous.time)) / Math.Pow(Math.Max(minimumTime, current.time - previous.time), 3);
-                case -1:
-                    return (100 * Distance(current, previous) + Distance(current, previous) * Math.Max(minimumTime, (current.time - previous.time) / 0.75)) / Math.Pow(Math.Max(minimumTime, (current.time - previous.time) / 0.75), 3);
+                case 1:  /// DT
+                    double dtTimeDifference = Math.Max(minimumTime, (current.time - previous.time) / 1.5);
+                    dtSpeedDifficulty += Math.Max(0, 62.5 / dtTimeDifference - 1);
+                    return (100 * currentDistance + currentDistance * dtTimeDifference) / Math.Pow(dtTimeDifference, 3);
+                case 0:  /// NM
+                    double nmTimeDifference = Math.Max(minimumTime, current.time - previous.time);
+                    nmSpeedDifficulty += Math.Max(0, 62.5 / nmTimeDifference - 1);
+                    return (100 * currentDistance + currentDistance * nmTimeDifference) / Math.Pow(nmTimeDifference, 3);
+                case -1: /// HT
+                    double htTimeDifference = Math.Max(minimumTime, (current.time - previous.time) / 0.75);
+                    htSpeedDifficulty += Math.Max(0, 62.5 / htTimeDifference - 1);
+                    return (100 * currentDistance + currentDistance * htTimeDifference) / Math.Pow(htTimeDifference, 3);
                 default:
                     return double.NaN;
             }
