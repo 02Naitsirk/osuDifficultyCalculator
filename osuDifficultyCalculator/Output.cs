@@ -34,8 +34,8 @@ namespace osuDifficultyCalculator
                         double nmDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], 0);
                         double dtDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], 1);
 
-                        int timeDifference = Math.Max(minimumTime, beatmap.osuNotes[i].time - beatmap.osuNotes[i - 1].time);
-                        int previousTimeDifference = Math.Max(minimumTime, beatmap.osuNotes[i - 1].time - beatmap.osuNotes[Math.Max(0, i - 2)].time);
+                        double timeDifference = Math.Max(minimumTime, beatmap.osuNotes[i].time - beatmap.osuNotes[i - 1].time);
+                        double previousTimeDifference = Math.Max(minimumTime, beatmap.osuNotes[i - 1].time - beatmap.osuNotes[Math.Max(0, i - 2)].time);
 
                         beatmap.ezhtDifficulties.Add(htDifficulty * (1 + ezOverlapPunishment * AngleBuff(angle, timeDifference / 0.75, previousTimeDifference / 0.75)));
                         beatmap.nmhtDifficulties.Add(htDifficulty * (1 + nmOverlapPunishment * AngleBuff(angle, timeDifference / 0.75, previousTimeDifference / 0.75)));
@@ -88,17 +88,17 @@ namespace osuDifficultyCalculator
                     }
 
                     /// Calculates star rating and pp.
-                    beatmap.ezhtStarRating = StarRating(beatmap.ezhtDifficulties, beatmap.circleSize / 2);
-                    beatmap.nmhtStarRating = StarRating(beatmap.nmhtDifficulties, beatmap.circleSize);
-                    beatmap.hrhtStarRating = StarRating(beatmap.hrhtDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
+                    beatmap.ezhtStarRating = StarRating(beatmap.ezhtDifficulties, beatmap.circleSize / 2) * (1 + htSpeedDifficulty / 1500);
+                    beatmap.nmhtStarRating = StarRating(beatmap.nmhtDifficulties, beatmap.circleSize) * (1 + htSpeedDifficulty / 1500);
+                    beatmap.hrhtStarRating = StarRating(beatmap.hrhtDifficulties, Math.Min(10, beatmap.circleSize * 1.3)) * (1 + htSpeedDifficulty / 1500);
 
-                    beatmap.ezStarRating = StarRating(beatmap.ezDifficulties, beatmap.circleSize / 2);
-                    beatmap.nmStarRating = StarRating(beatmap.nmDifficulties, beatmap.circleSize);
-                    beatmap.hrStarRating = StarRating(beatmap.hrDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
+                    beatmap.ezStarRating = StarRating(beatmap.ezDifficulties, beatmap.circleSize / 2) * (1 + nmSpeedDifficulty / 1500);
+                    beatmap.nmStarRating = StarRating(beatmap.nmDifficulties, beatmap.circleSize) * (1 + nmSpeedDifficulty / 1500);
+                    beatmap.hrStarRating = StarRating(beatmap.hrDifficulties, Math.Min(10, beatmap.circleSize * 1.3)) * (1 + nmSpeedDifficulty / 1500);
 
-                    beatmap.ezdtStarRating = StarRating(beatmap.ezdtDifficulties, beatmap.circleSize / 2);
-                    beatmap.nmdtStarRating = StarRating(beatmap.nmdtDifficulties, beatmap.circleSize);
-                    beatmap.hrdtStarRating = StarRating(beatmap.hrdtDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
+                    beatmap.ezdtStarRating = StarRating(beatmap.ezdtDifficulties, beatmap.circleSize / 2) * (1 + dtSpeedDifficulty / 1500);
+                    beatmap.nmdtStarRating = StarRating(beatmap.nmdtDifficulties, beatmap.circleSize) * (1 + dtSpeedDifficulty / 1500);
+                    beatmap.hrdtStarRating = StarRating(beatmap.hrdtDifficulties, Math.Min(10, beatmap.circleSize * 1.3)) * (1 + dtSpeedDifficulty / 1500);
 
                     double nm = PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes);
 
@@ -174,6 +174,9 @@ namespace osuDifficultyCalculator
                     beatmap.hrdtDifficulties.Clear();
 
                     beatmap.circleCount = 0;
+                    htSpeedDifficulty = 0;
+                    nmSpeedDifficulty = 0;
+                    dtSpeedDifficulty = 0;
                 }
 
                 /// In case of invalid input.
