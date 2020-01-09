@@ -10,7 +10,7 @@ namespace osuDifficultyCalculator
         private const double consistencyMultiplier = 0.98;
         private const double starRatingMultiplier = 53.0;
         private const double starRatingExponent = 0.34;
-        private const double ppMultiplier = 1.50;
+        private const double ppMultiplier = 1.5;
         private const double ppExponent = 2.43;
         public const double minimumTime = 37.5;
         public static double htSpeedDifficulty, nmSpeedDifficulty, dtSpeedDifficulty;
@@ -160,7 +160,7 @@ namespace osuDifficultyCalculator
         /// Minimum bonus is 1.0 at 0 circles; maximum bonus is 3.0 at ∞ circles.
         private static double LengthBonus(int circleCount)
         {
-            return 1 + 2 * circleCount / (double)(circleCount + 2000);
+            return 1 + 2.0 * circleCount / (circleCount + 2000);
         }
 
         /// Calculates the distance between two notes.
