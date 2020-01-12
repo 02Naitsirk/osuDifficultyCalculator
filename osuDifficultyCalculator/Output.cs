@@ -29,6 +29,7 @@ namespace osuDifficultyCalculator
                         double hrOverlapPunishment = Math.Min(1, Math.Pow(hrOverlap / (2 - hrOverlap), 2));
 
                         double angle = Angle(beatmap.osuNotes[Math.Max(0, i - 2)], beatmap.osuNotes[i - 1], beatmap.osuNotes[i]);
+                        double previousAngle = Angle(beatmap.osuNotes[Math.Max(0, i - 3)], beatmap.osuNotes[Math.Max(0, i - 2)], beatmap.osuNotes[i - 1]);
 
                         double htDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], -1);
                         double nmDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], 0);
@@ -37,17 +38,17 @@ namespace osuDifficultyCalculator
                         double timeDifference = Math.Max(minimumTime, beatmap.osuNotes[i].time - beatmap.osuNotes[i - 1].time);
                         double previousTimeDifference = Math.Max(minimumTime, beatmap.osuNotes[i - 1].time - beatmap.osuNotes[Math.Max(0, i - 2)].time);
 
-                        beatmap.ezhtDifficulties.Add(htDifficulty * (1 + ezOverlapPunishment * AngleBuff(angle, timeDifference / 0.75, previousTimeDifference / 0.75)));
-                        beatmap.nmhtDifficulties.Add(htDifficulty * (1 + nmOverlapPunishment * AngleBuff(angle, timeDifference / 0.75, previousTimeDifference / 0.75)));
-                        beatmap.hrhtDifficulties.Add(htDifficulty * (1 + hrOverlapPunishment * AngleBuff(angle, timeDifference / 0.75, previousTimeDifference / 0.75)));
+                        beatmap.ezhtDifficulties.Add(htDifficulty * (1 + ezOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference / 0.75, previousTimeDifference / 0.75)));
+                        beatmap.nmhtDifficulties.Add(htDifficulty * (1 + nmOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference / 0.75, previousTimeDifference / 0.75)));
+                        beatmap.hrhtDifficulties.Add(htDifficulty * (1 + hrOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference / 0.75, previousTimeDifference / 0.75)));
 
-                        beatmap.ezDifficulties.Add(nmDifficulty * (1 + ezOverlapPunishment * AngleBuff(angle, timeDifference, previousTimeDifference)));
-                        beatmap.nmDifficulties.Add(nmDifficulty * (1 + nmOverlapPunishment * AngleBuff(angle, timeDifference, previousTimeDifference)));
-                        beatmap.hrDifficulties.Add(nmDifficulty * (1 + hrOverlapPunishment * AngleBuff(angle, timeDifference, previousTimeDifference)));
+                        beatmap.ezDifficulties.Add(nmDifficulty * (1 + ezOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference, previousTimeDifference)));
+                        beatmap.nmDifficulties.Add(nmDifficulty * (1 + nmOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference, previousTimeDifference)));
+                        beatmap.hrDifficulties.Add(nmDifficulty * (1 + hrOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference, previousTimeDifference)));
 
-                        beatmap.ezdtDifficulties.Add(dtDifficulty * (1 + ezOverlapPunishment * AngleBuff(angle, Math.Max(minimumTime, timeDifference / 1.5), Math.Max(minimumTime, previousTimeDifference / 1.5))));
-                        beatmap.nmdtDifficulties.Add(dtDifficulty * (1 + nmOverlapPunishment * AngleBuff(angle, Math.Max(minimumTime, timeDifference / 1.5), Math.Max(minimumTime, previousTimeDifference / 1.5))));
-                        beatmap.hrdtDifficulties.Add(dtDifficulty * (1 + hrOverlapPunishment * AngleBuff(angle, Math.Max(minimumTime, timeDifference / 1.5), Math.Max(minimumTime, previousTimeDifference / 1.5))));
+                        beatmap.ezdtDifficulties.Add(dtDifficulty * (1 + ezOverlapPunishment * AngleComplexityBuff(angle, previousAngle, Math.Max(minimumTime, timeDifference / 1.5), Math.Max(minimumTime, previousTimeDifference / 1.5))));
+                        beatmap.nmdtDifficulties.Add(dtDifficulty * (1 + nmOverlapPunishment * AngleComplexityBuff(angle, previousAngle, Math.Max(minimumTime, timeDifference / 1.5), Math.Max(minimumTime, previousTimeDifference / 1.5))));
+                        beatmap.hrdtDifficulties.Add(dtDifficulty * (1 + hrOverlapPunishment * AngleComplexityBuff(angle, previousAngle, Math.Max(minimumTime, timeDifference / 1.5), Math.Max(minimumTime, previousTimeDifference / 1.5))));
                     }
 
                     /// Try to prevent SR from becoming extremely inflated.
