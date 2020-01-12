@@ -180,15 +180,16 @@ namespace osuDifficultyCalculator
                 : double.NaN;
         }
 
-        /// Buff low-bpm linear patterns and high-bpm snappy patterns.
-        public static double AngleBuff(double angle, double timeDifference, double previousTimeDifference)
+        /// Buff angle changes.
+        public static double AngleComplexityBuff(double angle, double previousAngle, double timeDifference, double previousTimeDifference)
         {
             timeDifference = Math.Max(minimumTime, timeDifference);
             previousTimeDifference = Math.Max(minimumTime, previousTimeDifference);
-            double timeDifferencePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference)); /// If the time difference between the last 3 notes varies significantly, reduce the angle buff.
-            double slowAngleBuff = (1 - Math.Pow(2, 9 - Math.Max(90, timeDifference) / 10)) * Math.Pow(Math.Sin(angle / 2), 2) + 1; /// Low BPM angle buff.
-            double fastAngleBuff = (1 - Math.Pow(4, Math.Min(90, timeDifference) / 10 - 9)) * Math.Pow(Math.Cos(angle / 2), 2) + 1; /// High BPM angle buff.
-            return double.IsNaN(angle) ? 0 : timeDifferencePunishment * (slowAngleBuff * fastAngleBuff - 1) / 1.5;
+            double timeDifferencePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference)); /// If the time difference between the last 3 notes varies significantly, reduce the buff.
+            double scaledAngle = Math.Pow(Math.Cos(angle / 2), 2);
+            double scaledPreviousAngle = Math.Pow(Math.Cos(previousAngle / 2), 2);
+            double angleDifference = Math.Abs(scaledAngle - scaledPreviousAngle);
+            return double.IsNaN(angle) || double.IsNaN(previousAngle) ? 0 : timeDifferencePunishment * angleDifference / 2;
         }
 
         /// Calculates the difficulty of a particular note.
