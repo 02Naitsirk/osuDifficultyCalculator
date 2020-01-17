@@ -201,15 +201,15 @@ namespace osuDifficultyCalculator
                 case 1:  /// DT
                     double dtTimeDifference = Math.Max(minimumTime, (current.time - previous.time) / 1.5);
                     dtSpeedDifficulty += Math.Max(0, 62.5 / dtTimeDifference - 1);
-                    return (100 * currentDistance + currentDistance * dtTimeDifference) / Math.Pow(dtTimeDifference, 3);
+                    return (100 * currentDistance * (1 + current.sliderDifficulty) + currentDistance * (1 + current.sliderDifficulty) * dtTimeDifference) / Math.Pow(dtTimeDifference, 3);
                 case 0:  /// NM
                     double nmTimeDifference = Math.Max(minimumTime, current.time - previous.time);
                     nmSpeedDifficulty += Math.Max(0, 62.5 / nmTimeDifference - 1);
-                    return (100 * currentDistance + currentDistance * nmTimeDifference) / Math.Pow(nmTimeDifference, 3);
+                    return (100 * currentDistance * (1 + current.sliderDifficulty) + currentDistance * (1 + current.sliderDifficulty) * nmTimeDifference) / Math.Pow(nmTimeDifference, 3);
                 case -1: /// HT
                     double htTimeDifference = Math.Max(minimumTime, (current.time - previous.time) / 0.75);
                     htSpeedDifficulty += Math.Max(0, 62.5 / htTimeDifference - 1);
-                    return (100 * currentDistance + currentDistance * htTimeDifference) / Math.Pow(htTimeDifference, 3);
+                    return (100 * currentDistance * (1 + current.sliderDifficulty) + currentDistance * (1 + current.sliderDifficulty) * htTimeDifference) / Math.Pow(htTimeDifference, 3);
                 default:
                     return double.NaN;
             }
