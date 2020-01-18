@@ -83,7 +83,6 @@ namespace osuDifficultyCalculator
                 }
                 if (line.Contains("Artist:"))
                 {
-                    Console.WriteLine(line);
                     artist = line.Split(new[] { ':' }, 2)[1];
                     continue;
                 }
