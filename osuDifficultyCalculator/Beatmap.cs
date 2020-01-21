@@ -31,15 +31,15 @@ namespace osuDifficultyCalculator
 
         public struct Note
         {
-            public int xCoordinate, yCoordinate, time, objectType;
-            public double sliderDifficulty;
-            public Note(int x, int y, int t, int o, double sD)
+            public double xCoordinate, yCoordinate, time, objectType, slideCount, travelDistance;
+            public Note(double x, double y, double t, double o, double s, double tD)
             {
                 xCoordinate = x;
                 yCoordinate = y;
                 time = t;
                 objectType = o;
-                sliderDifficulty = sD;
+                slideCount = s;
+                travelDistance = tD;
             }
         }
 
@@ -55,9 +55,9 @@ namespace osuDifficultyCalculator
                     int xCoordinate = Convert.ToInt32(line.Split(',')[0]);
                     int yCoordinate = Convert.ToInt32(line.Split(',')[1]);
                     int time = Convert.ToInt32(line.Split(',')[2]);
-                    int nextTime = (i != allLines.Length - 1 ? Convert.ToInt32(allLines[i + 1].Split(',')[2]) : int.MaxValue);
                     int objectType = Convert.ToInt32(line.Split(',')[3]);
-                    double sliderDifficulty = 0;
+                    int slideCount = 0;
+                    double travelDistance = 0;
                     if (objectType != 12)
                     {
                         objectCount++;
@@ -67,11 +67,10 @@ namespace osuDifficultyCalculator
                         }
                         else
                         {
-                            int slideCount = Convert.ToInt32(line.Split(',')[6]);
-                            double travelDistance = Math.Max(0, Convert.ToDouble(line.Split(',')[7]) - 2 * Calculate.Diameter(circleSize));
-                            sliderDifficulty = sliderTickRate * slideCount * travelDistance / Math.Max(37.5, nextTime - time);
+                            slideCount = Convert.ToInt32(line.Split(',')[6]);
+                            travelDistance = Math.Max(0, Convert.ToDouble(line.Split(',')[7]));
                         }
-                        Note note = new Note(xCoordinate, yCoordinate, time, objectType, sliderDifficulty);
+                        Note note = new Note(xCoordinate, yCoordinate, time, objectType, slideCount, travelDistance);
                         osuNotes.Add(note);
                     }
                     continue;
