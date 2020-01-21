@@ -25,7 +25,7 @@ Here is a table of almost all the maps mentioned in this section:
 
 Map|Old SR|New SR|Old SS|New SS|
 ---|---|---|---|---|
-Will Stetson - Harumachi Clover (Swing Arrangement) (Will Stetson) [Fiery's Extreme]|5.82*|5.02*||223pp|157pp|
+Will Stetson - Harumachi Clover (Swing Arrangement) (Will Stetson) [Fiery's Extreme]|5.82*|5.02*|223pp|157pp|
 supercell - Hero (Gottagof4st) [Sotarks' Wish]|6.20*|5.83*|290pp|249pp|
 Simple Plan - You Suck At Love (Speed Up Ver.) (Reform) [Extra]|5.92*|5.70*|267pp|239pp|
 Camellia - Exit This Earth's Atomosphere (rrtyui) [Evolution]|7.24*|8.37*|503pp|723pp|
