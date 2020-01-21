@@ -16,39 +16,38 @@ namespace osuDifficultyCalculator
                 {
                     beatmap.GetBeatmapData(fileName);
 
-                    /// Calculate difficulty for every note. Starts at the second note.
+                    /// Calculate difficulty for every note.
                     for (int i = 1; i < beatmap.osuNotes.Count; i++)
                     {
-                        double ezOverlap = Distance(beatmap.osuNotes[i], beatmap.osuNotes[i - 1]) / Diameter(beatmap.circleSize / 2);
-                        double ezOverlapPunishment = Math.Min(1, Math.Pow(ezOverlap / (2 - ezOverlap), 2));
+                        Beatmap.Note previousPreviousPreviousNote = i - 3 > -1 ? beatmap.osuNotes[i - 3] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.NegativeInfinity, 12, 0, 0);
+                        Beatmap.Note previousPreviousNote = i - 2 > -1 ? beatmap.osuNotes[i - 2] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.MinValue, 12, 0, 0);
+                        Beatmap.Note previousNote = i - 1 > -1 ? beatmap.osuNotes[i - 1] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, int.MinValue, 12, 0, 0);
+                        Beatmap.Note currentNote = beatmap.osuNotes[i];
+                        Beatmap.Note nextNote = i + 1 < beatmap.osuNotes.Count ? beatmap.osuNotes[i + 1] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.PositiveInfinity, 12, 0, 0);
 
-                        double nmOverlap = Distance(beatmap.osuNotes[i], beatmap.osuNotes[i - 1]) / Diameter(beatmap.circleSize);
-                        double nmOverlapPunishment = Math.Min(1, Math.Pow(nmOverlap / (2 - nmOverlap), 2));
+                        double ezhtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, beatmap.circleSize / 2, beatmap.sliderTickRate);
+                        double nmhtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, beatmap.circleSize, beatmap.sliderTickRate);
+                        double hrhtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
 
-                        double hrOverlap = Distance(beatmap.osuNotes[i], beatmap.osuNotes[i - 1]) / Diameter(Math.Min(10, beatmap.circleSize * 1.3));
-                        double hrOverlapPunishment = Math.Min(1, Math.Pow(hrOverlap / (2 - hrOverlap), 2));
+                        double ezDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, beatmap.circleSize / 2, beatmap.sliderTickRate);
+                        double nmDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, beatmap.circleSize, beatmap.sliderTickRate);
+                        double hrDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
 
-                        double angle = Angle(beatmap.osuNotes[Math.Max(0, i - 2)], beatmap.osuNotes[i - 1], beatmap.osuNotes[i]);
-                        double previousAngle = Angle(beatmap.osuNotes[Math.Max(0, i - 3)], beatmap.osuNotes[Math.Max(0, i - 2)], beatmap.osuNotes[i - 1]);
+                        double ezdtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, beatmap.circleSize / 2, beatmap.sliderTickRate);
+                        double nmdtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, beatmap.circleSize, beatmap.sliderTickRate);
+                        double hrdtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
 
-                        double htDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], -1);
-                        double nmDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], 0);
-                        double dtDifficulty = Difficulty(beatmap.osuNotes[i - 1], beatmap.osuNotes[i], 1);
+                        beatmap.ezhtDifficulties.Add(ezhtDifficulty);
+                        beatmap.nmhtDifficulties.Add(nmhtDifficulty);
+                        beatmap.hrhtDifficulties.Add(hrhtDifficulty);
 
-                        double timeDifference = Math.Max(minimumTime, beatmap.osuNotes[i].time - beatmap.osuNotes[i - 1].time);
-                        double previousTimeDifference = Math.Max(minimumTime, beatmap.osuNotes[i - 1].time - beatmap.osuNotes[Math.Max(0, i - 2)].time);
+                        beatmap.ezDifficulties.Add(ezDifficulty);
+                        beatmap.nmDifficulties.Add(nmDifficulty);
+                        beatmap.hrDifficulties.Add(hrDifficulty);
 
-                        beatmap.ezhtDifficulties.Add(htDifficulty * (1 + ezOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference / 0.75, previousTimeDifference / 0.75)));
-                        beatmap.nmhtDifficulties.Add(htDifficulty * (1 + nmOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference / 0.75, previousTimeDifference / 0.75)));
-                        beatmap.hrhtDifficulties.Add(htDifficulty * (1 + hrOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference / 0.75, previousTimeDifference / 0.75)));
-
-                        beatmap.ezDifficulties.Add(nmDifficulty * (1 + ezOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference, previousTimeDifference)));
-                        beatmap.nmDifficulties.Add(nmDifficulty * (1 + nmOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference, previousTimeDifference)));
-                        beatmap.hrDifficulties.Add(nmDifficulty * (1 + hrOverlapPunishment * AngleComplexityBuff(angle, previousAngle, timeDifference, previousTimeDifference)));
-
-                        beatmap.ezdtDifficulties.Add(dtDifficulty * (1 + ezOverlapPunishment * AngleComplexityBuff(angle, previousAngle, Math.Max(minimumTime, timeDifference / 1.5), Math.Max(minimumTime, previousTimeDifference / 1.5))));
-                        beatmap.nmdtDifficulties.Add(dtDifficulty * (1 + nmOverlapPunishment * AngleComplexityBuff(angle, previousAngle, Math.Max(minimumTime, timeDifference / 1.5), Math.Max(minimumTime, previousTimeDifference / 1.5))));
-                        beatmap.hrdtDifficulties.Add(dtDifficulty * (1 + hrOverlapPunishment * AngleComplexityBuff(angle, previousAngle, Math.Max(minimumTime, timeDifference / 1.5), Math.Max(minimumTime, previousTimeDifference / 1.5))));
+                        beatmap.ezdtDifficulties.Add(ezdtDifficulty);
+                        beatmap.nmdtDifficulties.Add(nmdtDifficulty);
+                        beatmap.hrdtDifficulties.Add(hrdtDifficulty);
                     }
 
                     /// Try to prevent SR from becoming extremely inflated.
@@ -89,17 +88,17 @@ namespace osuDifficultyCalculator
                     }
 
                     /// Calculates star rating and pp.
-                    beatmap.ezhtStarRating = StarRating(beatmap.ezhtDifficulties, beatmap.circleSize / 2) * (1 + htSpeedDifficulty / 1500);
-                    beatmap.nmhtStarRating = StarRating(beatmap.nmhtDifficulties, beatmap.circleSize) * (1 + htSpeedDifficulty / 1500);
-                    beatmap.hrhtStarRating = StarRating(beatmap.hrhtDifficulties, Math.Min(10, beatmap.circleSize * 1.3)) * (1 + htSpeedDifficulty / 1500);
+                    beatmap.ezhtStarRating = StarRating(beatmap.ezhtDifficulties, beatmap.circleSize / 2);
+                    beatmap.nmhtStarRating = StarRating(beatmap.nmhtDifficulties, beatmap.circleSize);
+                    beatmap.hrhtStarRating = StarRating(beatmap.hrhtDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
 
-                    beatmap.ezStarRating = StarRating(beatmap.ezDifficulties, beatmap.circleSize / 2) * (1 + nmSpeedDifficulty / 1500);
-                    beatmap.nmStarRating = StarRating(beatmap.nmDifficulties, beatmap.circleSize) * (1 + nmSpeedDifficulty / 1500);
-                    beatmap.hrStarRating = StarRating(beatmap.hrDifficulties, Math.Min(10, beatmap.circleSize * 1.3)) * (1 + nmSpeedDifficulty / 1500);
+                    beatmap.ezStarRating = StarRating(beatmap.ezDifficulties, beatmap.circleSize / 2);
+                    beatmap.nmStarRating = StarRating(beatmap.nmDifficulties, beatmap.circleSize);
+                    beatmap.hrStarRating = StarRating(beatmap.hrDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
 
-                    beatmap.ezdtStarRating = StarRating(beatmap.ezdtDifficulties, beatmap.circleSize / 2) * (1 + dtSpeedDifficulty / 1500);
-                    beatmap.nmdtStarRating = StarRating(beatmap.nmdtDifficulties, beatmap.circleSize) * (1 + dtSpeedDifficulty / 1500);
-                    beatmap.hrdtStarRating = StarRating(beatmap.hrdtDifficulties, Math.Min(10, beatmap.circleSize * 1.3)) * (1 + dtSpeedDifficulty / 1500);
+                    beatmap.ezdtStarRating = StarRating(beatmap.ezdtDifficulties, beatmap.circleSize / 2);
+                    beatmap.nmdtStarRating = StarRating(beatmap.nmdtDifficulties, beatmap.circleSize);
+                    beatmap.hrdtStarRating = StarRating(beatmap.hrdtDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
 
                     double nm = PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes);
 
@@ -175,9 +174,6 @@ namespace osuDifficultyCalculator
                     beatmap.hrdtDifficulties.Clear();
 
                     beatmap.circleCount = 0;
-                    htSpeedDifficulty = 0;
-                    nmSpeedDifficulty = 0;
-                    dtSpeedDifficulty = 0;
                 }
 
                 /// In case of invalid input.
