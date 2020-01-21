@@ -13,7 +13,6 @@ namespace osuDifficultyCalculator
         private const double ppMultiplier = 1.5;
         private const double ppExponent = 2.43;
         public const double minimumTime = 37.5;
-        public static double htSpeedDifficulty, nmSpeedDifficulty, dtSpeedDifficulty;
 
         public enum Mods
         {
@@ -193,25 +192,38 @@ namespace osuDifficultyCalculator
         }
 
         /// Calculates the difficulty of a particular note.
-        public static double Difficulty(Note previous, Note current, int speedUpMod)
+        public static double Difficulty(Note previousPreviousPreviousNote, Note previousPreviousNote, Note previousNote, Note currentNote, Note nextNote, int speedUpMod, double circleSize, double tickRate)
         {
-            double currentDistance = Distance(current, previous);
+            double currentDistance = Distance(currentNote, previousNote);
+            double overlap = Distance(currentNote, previousNote) / Diameter(circleSize);
+            double overlapPunishment = Math.Min(1, Math.Pow(overlap / (2 - overlap), 2));
+            double angle = Angle(previousPreviousNote, previousNote, currentNote);
+            double previousAngle = Angle(previousPreviousPreviousNote, previousPreviousNote, previousNote);
             switch (speedUpMod)
             {
                 case 1:  /// DT
-                    double dtTimeDifference = Math.Max(minimumTime, (current.time - previous.time) / 1.5);
-                    dtSpeedDifficulty += Math.Max(0, 62.5 / dtTimeDifference - 1);
-                    return (100 * currentDistance * (1 + current.sliderDifficulty) + currentDistance * (1 + current.sliderDifficulty) * dtTimeDifference) / Math.Pow(dtTimeDifference, 3);
+                    double previousDtTimeDifference = Math.Max(minimumTime, (previousNote.time - previousPreviousNote.time) / 1.5);
+                    double dtTimeDifference = Math.Max(minimumTime, (currentNote.time - previousNote.time) / 1.5);
+                    double dtSpeedBuff = Math.Max(1, 62.5 / dtTimeDifference);
+                    double dtSliderDifficulty = Math.Max(0, tickRate * currentNote.slideCount * (currentNote.travelDistance - 2 * Diameter(circleSize))) / Math.Max(minimumTime, (nextNote.time - currentNote.time) / 1.5);
+                    double baseDtDifficulty = (100 * currentDistance * (1 + dtSliderDifficulty) + currentDistance * (1 + dtSliderDifficulty) * dtTimeDifference) / Math.Pow(dtTimeDifference, 3);
+                    return baseDtDifficulty * dtSpeedBuff * (1 + overlapPunishment * AngleComplexityBuff(angle, previousAngle, dtTimeDifference, previousDtTimeDifference));
                 case 0:  /// NM
-                    double nmTimeDifference = Math.Max(minimumTime, current.time - previous.time);
-                    nmSpeedDifficulty += Math.Max(0, 62.5 / nmTimeDifference - 1);
-                    return (100 * currentDistance * (1 + current.sliderDifficulty) + currentDistance * (1 + current.sliderDifficulty) * nmTimeDifference) / Math.Pow(nmTimeDifference, 3);
+                    double previousNmTimeDifference = Math.Max(minimumTime, previousNote.time - previousPreviousNote.time);
+                    double nmTimeDifference = Math.Max(minimumTime, currentNote.time - previousNote.time);
+                    double nmSpeedBuff = Math.Max(1, 62.5 / nmTimeDifference);
+                    double nmSliderDifficulty = Math.Max(0, tickRate * currentNote.slideCount * (currentNote.travelDistance - 2 * Diameter(circleSize))) / Math.Max(minimumTime, nextNote.time - currentNote.time);
+                    double baseNmDifficulty = (100 * currentDistance * (1 + nmSliderDifficulty) + currentDistance * (1 + nmSliderDifficulty) * nmTimeDifference) / Math.Pow(nmTimeDifference, 3);
+                    return baseNmDifficulty * nmSpeedBuff * (1 + overlapPunishment * AngleComplexityBuff(angle, previousAngle, nmTimeDifference, previousNmTimeDifference));
                 case -1: /// HT
-                    double htTimeDifference = Math.Max(minimumTime, (current.time - previous.time) / 0.75);
-                    htSpeedDifficulty += Math.Max(0, 62.5 / htTimeDifference - 1);
-                    return (100 * currentDistance * (1 + current.sliderDifficulty) + currentDistance * (1 + current.sliderDifficulty) * htTimeDifference) / Math.Pow(htTimeDifference, 3);
+                    double previousHtTimeDifference = Math.Max(minimumTime, (previousNote.time - previousPreviousNote.time) / 0.75);
+                    double htTimeDifference = Math.Max(minimumTime, (currentNote.time - previousNote.time) / 0.75);
+                    double htSpeedBuff = Math.Max(1, 62.5 / htTimeDifference);
+                    double htSliderDifficulty = Math.Max(0, tickRate * currentNote.slideCount * (currentNote.travelDistance - 2 * Diameter(circleSize))) / Math.Max(minimumTime, (nextNote.time - currentNote.time) / 0.75);
+                    double baseHtDifficulty = (100 * currentDistance * (1 + htSliderDifficulty) + currentDistance * (1 + htSliderDifficulty) * htTimeDifference) / Math.Pow(htTimeDifference, 3);
+                    return baseHtDifficulty * htSpeedBuff * (1 + overlapPunishment * AngleComplexityBuff(angle, previousAngle, htTimeDifference, previousHtTimeDifference));
                 default:
-                    return double.NaN;
+                    return 0;
             }
         }
 
