@@ -1,5 +1,4 @@
 using System;
-using static osuDifficultyCalculator.Calculate;
 
 namespace osuDifficultyCalculator
 {
@@ -8,10 +7,14 @@ namespace osuDifficultyCalculator
         static void Main()
         {
             Beatmap beatmap = new Beatmap();
+            Calculate calculate = new Calculate();
             while (true)
             {
                 string fileName = Console.ReadLine().Replace("\"", "");
-                if (fileName.Trim().ToLowerInvariant() == "e") break;
+                if (fileName.Trim().ToLowerInvariant() == "e")
+                {
+                    break;
+                }
                 try
                 {
                     beatmap.GetBeatmapData(fileName);
@@ -25,17 +28,17 @@ namespace osuDifficultyCalculator
                         Beatmap.Note currentNote = beatmap.osuNotes[i];
                         Beatmap.Note nextNote = i + 1 < beatmap.osuNotes.Count ? beatmap.osuNotes[i + 1] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.PositiveInfinity, 12, 0, 0);
 
-                        double ezhtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, beatmap.circleSize / 2, beatmap.sliderTickRate);
-                        double nmhtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, beatmap.circleSize, beatmap.sliderTickRate);
-                        double hrhtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
+                        double ezhtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, beatmap.circleSize / 2, beatmap.sliderTickRate);
+                        double nmhtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, beatmap.circleSize, beatmap.sliderTickRate);
+                        double hrhtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
 
-                        double ezDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, beatmap.circleSize / 2, beatmap.sliderTickRate);
-                        double nmDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, beatmap.circleSize, beatmap.sliderTickRate);
-                        double hrDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
+                        double ezDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, beatmap.circleSize / 2, beatmap.sliderTickRate);
+                        double nmDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, beatmap.circleSize, beatmap.sliderTickRate);
+                        double hrDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
 
-                        double ezdtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, beatmap.circleSize / 2, beatmap.sliderTickRate);
-                        double nmdtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, beatmap.circleSize, beatmap.sliderTickRate);
-                        double hrdtDifficulty = Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
+                        double ezdtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, beatmap.circleSize / 2, beatmap.sliderTickRate);
+                        double nmdtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, beatmap.circleSize, beatmap.sliderTickRate, true);
+                        double hrdtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
 
                         beatmap.ezhtDifficulties.Add(ezhtDifficulty);
                         beatmap.nmhtDifficulties.Add(nmhtDifficulty);
@@ -88,58 +91,58 @@ namespace osuDifficultyCalculator
                     }
 
                     /// Calculates star rating and pp.
-                    beatmap.ezhtStarRating = StarRating(beatmap.ezhtDifficulties, beatmap.circleSize / 2);
-                    beatmap.nmhtStarRating = StarRating(beatmap.nmhtDifficulties, beatmap.circleSize);
-                    beatmap.hrhtStarRating = StarRating(beatmap.hrhtDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
+                    beatmap.ezhtStarRating = calculate.StarRating(beatmap.ezhtDifficulties, beatmap.circleSize / 2);
+                    beatmap.nmhtStarRating = calculate.StarRating(beatmap.nmhtDifficulties, beatmap.circleSize);
+                    beatmap.hrhtStarRating = calculate.StarRating(beatmap.hrhtDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
 
-                    beatmap.ezStarRating = StarRating(beatmap.ezDifficulties, beatmap.circleSize / 2);
-                    beatmap.nmStarRating = StarRating(beatmap.nmDifficulties, beatmap.circleSize);
-                    beatmap.hrStarRating = StarRating(beatmap.hrDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
+                    beatmap.ezStarRating = calculate.StarRating(beatmap.ezDifficulties, beatmap.circleSize / 2);
+                    beatmap.nmStarRating = calculate.StarRating(beatmap.nmDifficulties, beatmap.circleSize);
+                    beatmap.hrStarRating = calculate.StarRating(beatmap.hrDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
 
-                    beatmap.ezdtStarRating = StarRating(beatmap.ezdtDifficulties, beatmap.circleSize / 2);
-                    beatmap.nmdtStarRating = StarRating(beatmap.nmdtDifficulties, beatmap.circleSize);
-                    beatmap.hrdtStarRating = StarRating(beatmap.hrdtDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
+                    beatmap.ezdtStarRating = calculate.StarRating(beatmap.ezdtDifficulties, beatmap.circleSize / 2);
+                    beatmap.nmdtStarRating = calculate.StarRating(beatmap.nmdtDifficulties, beatmap.circleSize);
+                    beatmap.hrdtStarRating = calculate.StarRating(beatmap.hrdtDifficulties, Math.Min(10, beatmap.circleSize * 1.3));
 
-                    double nm = PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes);
+                    double nm = calculate.PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes);
 
-                    double dt = PP(beatmap.nmdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT);
-                    double ez = PP(beatmap.ezStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.EZ);
-                    double fl = PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.FL);
-                    double hd = PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.HD);
-                    double hr = PP(beatmap.hrStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.HR);
-                    double ht = PP(beatmap.nmhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.HT);
+                    double dt = calculate.PP(beatmap.nmdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT);
+                    double ez = calculate.PP(beatmap.ezStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.EZ);
+                    double fl = calculate.PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.FL);
+                    double hd = calculate.PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.HD);
+                    double hr = calculate.PP(beatmap.hrStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.HR);
+                    double ht = calculate.PP(beatmap.nmhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.HT);
 
-                    double dtez = PP(beatmap.ezdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.EZ);
-                    double dtfl = PP(beatmap.nmdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.FL);
-                    double dthd = PP(beatmap.nmdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.HD);
-                    double dthr = PP(beatmap.hrdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.HR);
-                    double ezfl = PP(beatmap.ezStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.EZ * (int)Mods.FL);
-                    double ezhd = PP(beatmap.ezStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.EZ * (int)Mods.HD);
-                    double ezht = PP(beatmap.ezhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.EZ * (int)Mods.HT);
-                    double flhd = PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.FL * (int)Mods.HD);
-                    double flhr = PP(beatmap.hrStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.FL * (int)Mods.HR);
-                    double flht = PP(beatmap.nmhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.FL * (int)Mods.HT);
-                    double hdhr = PP(beatmap.hrStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.HD * (int)Mods.HR);
-                    double hdht = PP(beatmap.nmhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.HD * (int)Mods.HT);
-                    double hrht = PP(beatmap.hrhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.HR * (int)Mods.HT);
+                    double dtez = calculate.PP(beatmap.ezdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.EZ);
+                    double dtfl = calculate.PP(beatmap.nmdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.FL);
+                    double dthd = calculate.PP(beatmap.nmdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.HD);
+                    double dthr = calculate.PP(beatmap.hrdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.HR);
+                    double ezfl = calculate.PP(beatmap.ezStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.EZ * (int)Calculate.Mods.FL);
+                    double ezhd = calculate.PP(beatmap.ezStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.EZ * (int)Calculate.Mods.HD);
+                    double ezht = calculate.PP(beatmap.ezhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.EZ * (int)Calculate.Mods.HT);
+                    double flhd = calculate.PP(beatmap.nmStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.FL * (int)Calculate.Mods.HD);
+                    double flhr = calculate.PP(beatmap.hrStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.FL * (int)Calculate.Mods.HR);
+                    double flht = calculate.PP(beatmap.nmhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.FL * (int)Calculate.Mods.HT);
+                    double hdhr = calculate.PP(beatmap.hrStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.HD * (int)Calculate.Mods.HR);
+                    double hdht = calculate.PP(beatmap.nmhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.HD * (int)Calculate.Mods.HT);
+                    double hrht = calculate.PP(beatmap.hrhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.HR * (int)Calculate.Mods.HT);
 
-                    double dtezfl = PP(beatmap.ezdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.EZ * (int)Mods.FL);
-                    double dtezhd = PP(beatmap.ezdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.EZ * (int)Mods.HD);
-                    double dtflhd = PP(beatmap.nmdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.FL * (int)Mods.HD);
-                    double dtflhr = PP(beatmap.hrdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.FL * (int)Mods.HR);
-                    double dthdhr = PP(beatmap.hrdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.HD * (int)Mods.HR);
-                    double ezflhd = PP(beatmap.ezStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.EZ * (int)Mods.FL * (int)Mods.HD);
-                    double ezflht = PP(beatmap.ezhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.EZ * (int)Mods.FL * (int)Mods.HT);
-                    double ezhdht = PP(beatmap.ezhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.EZ * (int)Mods.HD * (int)Mods.HT);
-                    double flhdhr = PP(beatmap.hrStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.FL * (int)Mods.HD * (int)Mods.HR);
-                    double flhdht = PP(beatmap.nmhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.FL * (int)Mods.HD * (int)Mods.HT);
-                    double flhrht = PP(beatmap.hrhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.FL * (int)Mods.HR * (int)Mods.HT);
-                    double hdhrht = PP(beatmap.hrhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.HD * (int)Mods.HR * (int)Mods.HT);
+                    double dtezfl = calculate.PP(beatmap.ezdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.EZ * (int)Calculate.Mods.FL);
+                    double dtezhd = calculate.PP(beatmap.ezdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.EZ * (int)Calculate.Mods.HD);
+                    double dtflhd = calculate.PP(beatmap.nmdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.FL * (int)Calculate.Mods.HD);
+                    double dtflhr = calculate.PP(beatmap.hrdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.FL * (int)Calculate.Mods.HR);
+                    double dthdhr = calculate.PP(beatmap.hrdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.HD * (int)Calculate.Mods.HR);
+                    double ezflhd = calculate.PP(beatmap.ezStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.EZ * (int)Calculate.Mods.FL * (int)Calculate.Mods.HD);
+                    double ezflht = calculate.PP(beatmap.ezhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.EZ * (int)Calculate.Mods.FL * (int)Calculate.Mods.HT);
+                    double ezhdht = calculate.PP(beatmap.ezhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.EZ * (int)Calculate.Mods.HD * (int)Calculate.Mods.HT);
+                    double flhdhr = calculate.PP(beatmap.hrStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.FL * (int)Calculate.Mods.HD * (int)Calculate.Mods.HR);
+                    double flhdht = calculate.PP(beatmap.nmhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.FL * (int)Calculate.Mods.HD * (int)Calculate.Mods.HT);
+                    double flhrht = calculate.PP(beatmap.hrhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.FL * (int)Calculate.Mods.HR * (int)Calculate.Mods.HT);
+                    double hdhrht = calculate.PP(beatmap.hrhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.HD * (int)Calculate.Mods.HR * (int)Calculate.Mods.HT);
 
-                    double dtezflhd = PP(beatmap.ezdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.EZ * (int)Mods.FL * (int)Mods.HD);
-                    double dtflhdhr = PP(beatmap.hrdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.DT * (int)Mods.FL * (int)Mods.HD * (int)Mods.HR);
-                    double ezflhdht = PP(beatmap.ezhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.EZ * (int)Mods.FL * (int)Mods.HD * (int)Mods.HT);
-                    double flhdhrht = PP(beatmap.hrhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Mods.FL * (int)Mods.HD * (int)Mods.HR * (int)Mods.DT);
+                    double dtezflhd = calculate.PP(beatmap.ezdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.EZ * (int)Calculate.Mods.FL * (int)Calculate.Mods.HD);
+                    double dtflhdhr = calculate.PP(beatmap.hrdtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.DT * (int)Calculate.Mods.FL * (int)Calculate.Mods.HD * (int)Calculate.Mods.HR);
+                    double ezflhdht = calculate.PP(beatmap.ezhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.EZ * (int)Calculate.Mods.FL * (int)Calculate.Mods.HD * (int)Calculate.Mods.HT);
+                    double flhdhrht = calculate.PP(beatmap.hrhtStarRating, beatmap.overallDifficulty, beatmap.approachRate, beatmap.circleCount, beatmap.osuNotes, (int)Calculate.Mods.FL * (int)Calculate.Mods.HD * (int)Calculate.Mods.HR * (int)Calculate.Mods.DT);
 
                     /// Outputs star rating and pp.
                     Console.WriteLine($"\n{beatmap.artist} - {beatmap.title} ({beatmap.creator}) [{beatmap.version}]");
