@@ -7,9 +7,12 @@ namespace osuDifficultyCalculator
     public class Beatmap
     {
         public double circleSize, overallDifficulty, approachRate, sliderTickRate,
-            ezhtStarRating, nmhtStarRating, hrhtStarRating,
-            ezStarRating, nmStarRating, hrStarRating,
-            ezdtStarRating, nmdtStarRating, hrdtStarRating;
+
+            ezhtAimStarRating, nmhtAimStarRating, hrhtAimStarRating,
+            ezAimStarRating, nmAimStarRating, hrAimStarRating,
+            ezdtAimStarRating, nmdtAimStarRating, hrdtAimStarRating,
+
+            htSpeedStarRating, nmSpeedStarRating, dtSpeedStarRating;
 
         public int circleCount, objectCount;
 
@@ -17,17 +20,27 @@ namespace osuDifficultyCalculator
 
         public List<Note> osuNotes = new List<Note>();
 
-        public List<double> ezhtDifficulties = new List<double>();
-        public List<double> nmhtDifficulties = new List<double>();
-        public List<double> hrhtDifficulties = new List<double>();
+        /// <summary>
+        ///  Aim
+        /// </summary>
+        public List<double> ezhtAimDifficulties = new List<double>();
+        public List<double> nmhtAimDifficulties = new List<double>();
+        public List<double> hrhtAimDifficulties = new List<double>();
 
-        public List<double> ezDifficulties = new List<double>();
-        public List<double> nmDifficulties = new List<double>();
-        public List<double> hrDifficulties = new List<double>();
+        public List<double> ezAimDifficulties = new List<double>();
+        public List<double> nmAimDifficulties = new List<double>();
+        public List<double> hrAimDifficulties = new List<double>();
 
-        public List<double> ezdtDifficulties = new List<double>();
-        public List<double> nmdtDifficulties = new List<double>();
-        public List<double> hrdtDifficulties = new List<double>();
+        public List<double> ezdtAimDifficulties = new List<double>();
+        public List<double> nmdtAimDifficulties = new List<double>();
+        public List<double> hrdtAimDifficulties = new List<double>();
+
+        /// <summary>
+        /// Speed
+        /// </summary>
+        public List<double> htSpeedDifficulties = new List<double>();
+        public List<double> nmSpeedDifficulties = new List<double>();
+        public List<double> dtSpeedDifficulties = new List<double>();
 
         public struct Note
         {
