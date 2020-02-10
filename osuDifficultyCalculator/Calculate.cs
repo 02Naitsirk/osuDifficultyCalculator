@@ -158,7 +158,7 @@ namespace osuDifficultyCalculator
         /// Minimum bonus is 1.0 at 0 circles; maximum bonus is 3.0 at ∞ circles.
         private double LengthBonus(int circleCount)
         {
-            return 1 + 1.8 * circleCount / (circleCount + 2000);
+            return 1 + 1.9 * circleCount / (circleCount + 2000);
         }
 
         /// Calculates the distance between two notes.
@@ -179,15 +179,15 @@ namespace osuDifficultyCalculator
         }
 
         /// Buff angle changes.
-        public double AngleComplexityBuff(double angle, double previousAngle, double timeDifference, double previousTimeDifference)
+        public double AngleChangeBuff(double angle, double previousAngle, double timeDifference, double previousTimeDifference)
         {
-            timeDifference = Math.Max(minimumTime, timeDifference);
             previousTimeDifference = Math.Max(minimumTime, previousTimeDifference);
-            double timeDifferencePunishment = Math.Pow(2, -Math.Abs(1 - timeDifference / previousTimeDifference)); /// If the time difference between the last 3 notes varies significantly, reduce the buff.
+            timeDifference = Math.Max(minimumTime, timeDifference);
+            double timeDifferencePunishment = Math.Pow(3, -Math.Pow(timeDifference - previousTimeDifference, 2) / 1000);
             double scaledAngle = Math.Pow(Math.Cos(angle / 2), 2);
             double scaledPreviousAngle = Math.Pow(Math.Cos(previousAngle / 2), 2);
-            double angleDifference = Math.Abs(scaledAngle - scaledPreviousAngle);
-            return double.IsNaN(angle) || double.IsNaN(previousAngle) ? 0 : timeDifferencePunishment * angleDifference / 2;
+            double angleDifference = Math.Abs(scaledAngle - scaledPreviousAngle) - 0.2;
+            return double.IsNaN(angle) || double.IsNaN(previousAngle) ? 0 : timeDifferencePunishment * angleDifference;
         }
 
         /// Calculates the difficulty of a particular note.
@@ -195,7 +195,7 @@ namespace osuDifficultyCalculator
         {
             double currentDistance = Distance(currentNote, previousNote);
             double overlap = Distance(currentNote, previousNote) / Diameter(circleSize);
-            double overlapPunishment = Math.Min(1, Math.Pow(overlap / (2 - overlap), 2));
+            double overlapPunishment = Math.Min(1, Math.Pow(overlap, 2));
             double angle = Angle(previousPreviousNote, previousNote, currentNote);
             double previousAngle = Angle(previousPreviousPreviousNote, previousPreviousNote, previousNote);
             switch (speedUpMod)
@@ -206,7 +206,9 @@ namespace osuDifficultyCalculator
                     double dtSpeedBuff = Math.Max(1, 62.5 / dtTimeDifference);
                     double dtSliderDifficulty = Math.Max(0, tickRate * currentNote.slideCount * (currentNote.travelDistance - 2 * Diameter(circleSize))) / Math.Max(minimumTime, (nextNote.time - currentNote.time) / 1.5);
                     double baseDtDifficulty = (100 * currentDistance * (1 + dtSliderDifficulty) + currentDistance * (1 + dtSliderDifficulty) * dtTimeDifference) / Math.Pow(dtTimeDifference, 3);
-                    double dtDifficulty = baseDtDifficulty * dtSpeedBuff * (1 + overlapPunishment * AngleComplexityBuff(angle, previousAngle, dtTimeDifference, previousDtTimeDifference));
+                    double dtDifficulty = baseDtDifficulty * dtSpeedBuff * (1 + overlapPunishment * AngleChangeBuff(angle, previousAngle, dtTimeDifference, previousDtTimeDifference));
+                    if (doPrint)
+                        Console.WriteLine($"{currentNote.time}, {dtDifficulty}");
                     return dtDifficulty;
                 case 0:  /// NM
                     double previousNmTimeDifference = Math.Max(minimumTime, previousNote.time - previousPreviousNote.time);
@@ -214,7 +216,9 @@ namespace osuDifficultyCalculator
                     double nmSpeedBuff = Math.Max(1, 62.5 / nmTimeDifference);
                     double nmSliderDifficulty = Math.Max(0, tickRate * currentNote.slideCount * (currentNote.travelDistance - 2 * Diameter(circleSize))) / Math.Max(minimumTime, nextNote.time - currentNote.time);
                     double baseNmDifficulty = (100 * currentDistance * (1 + nmSliderDifficulty) + currentDistance * (1 + nmSliderDifficulty) * nmTimeDifference) / Math.Pow(nmTimeDifference, 3);
-                    double nmDifficulty = baseNmDifficulty * nmSpeedBuff * (1 + overlapPunishment * AngleComplexityBuff(angle, previousAngle, nmTimeDifference, previousNmTimeDifference));
+                    double nmDifficulty = baseNmDifficulty * nmSpeedBuff * (1 + overlapPunishment * AngleChangeBuff(angle, previousAngle, nmTimeDifference, previousNmTimeDifference));
+                    if (doPrint)
+                        Console.WriteLine($"{currentNote.time}, {nmDifficulty}");
                     return nmDifficulty;
                 case -1: /// HT
                     double previousHtTimeDifference = Math.Max(minimumTime, (previousNote.time - previousPreviousNote.time) / 0.75);
@@ -222,7 +226,9 @@ namespace osuDifficultyCalculator
                     double htSpeedBuff = Math.Max(1, 62.5 / htTimeDifference);
                     double htSliderDifficulty = Math.Max(0, tickRate * currentNote.slideCount * (currentNote.travelDistance - 2 * Diameter(circleSize))) / Math.Max(minimumTime, (nextNote.time - currentNote.time) / 0.75);
                     double baseHtDifficulty = (100 * currentDistance * (1 + htSliderDifficulty) + currentDistance * (1 + htSliderDifficulty) * htTimeDifference) / Math.Pow(htTimeDifference, 3);
-                    double htDifficulty = baseHtDifficulty * htSpeedBuff * (1 + overlapPunishment * AngleComplexityBuff(angle, previousAngle, htTimeDifference, previousHtTimeDifference));
+                    double htDifficulty = baseHtDifficulty * htSpeedBuff * (1 + overlapPunishment * AngleChangeBuff(angle, previousAngle, htTimeDifference, previousHtTimeDifference));
+                    if (doPrint)
+                        Console.WriteLine($"{currentNote.time}, {htDifficulty}");
                     return htDifficulty;
                 default:
                     return 0;
