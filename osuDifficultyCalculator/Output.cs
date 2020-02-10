@@ -37,7 +37,7 @@ namespace osuDifficultyCalculator
                         double hrDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 0, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
 
                         double ezdtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, beatmap.circleSize / 2, beatmap.sliderTickRate);
-                        double nmdtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, beatmap.circleSize, beatmap.sliderTickRate, true);
+                        double nmdtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, beatmap.circleSize, beatmap.sliderTickRate);
                         double hrdtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, 1, Math.Min(10, beatmap.circleSize * 1.3), beatmap.sliderTickRate);
 
                         beatmap.ezhtDifficulties.Add(ezhtDifficulty);
@@ -68,26 +68,27 @@ namespace osuDifficultyCalculator
                         double nmdtProportion = beatmap.nmdtDifficulties[i] > 0 ? beatmap.nmdtDifficulties[i - 1] / beatmap.nmdtDifficulties[i] : double.PositiveInfinity;
                         double hrdtProportion = beatmap.hrdtDifficulties[i] > 0 ? beatmap.hrdtDifficulties[i - 1] / beatmap.hrdtDifficulties[i] : double.PositiveInfinity;
 
+                        const int h = 4;
                         if (ezhtProportion < 0.5)
-                            beatmap.ezhtDifficulties[i] *= 1 - 4 * Math.Pow(ezhtProportion - 0.5, 2);
+                            beatmap.ezhtDifficulties[i] *= 1 - h * Math.Pow(ezhtProportion - 0.5, 2);
                         if (nmhtProportion < 0.5)
-                            beatmap.nmhtDifficulties[i] *= 1 - 4 * Math.Pow(nmhtProportion - 0.5, 2);
+                            beatmap.nmhtDifficulties[i] *= 1 - h * Math.Pow(nmhtProportion - 0.5, 2);
                         if (hrhtProportion < 0.5)
-                            beatmap.hrhtDifficulties[i] *= 1 - 4 * Math.Pow(hrhtProportion - 0.5, 2);
+                            beatmap.hrhtDifficulties[i] *= 1 - h * Math.Pow(hrhtProportion - 0.5, 2);
 
                         if (ezProportion < 0.5)
-                            beatmap.ezDifficulties[i] *= 1 - 4 * Math.Pow(ezProportion - 0.5, 2);
+                            beatmap.ezDifficulties[i] *= 1 - h * Math.Pow(ezProportion - 0.5, 2);
                         if (nmProportion < 0.5)
-                            beatmap.nmDifficulties[i] *= 1 - 4 * Math.Pow(nmProportion - 0.5, 2);
+                            beatmap.nmDifficulties[i] *= 1 - h * Math.Pow(nmProportion - 0.5, 2);
                         if (hrProportion < 0.5)
-                            beatmap.hrDifficulties[i] *= 1 - 4 * Math.Pow(hrProportion - 0.5, 2);
+                            beatmap.hrDifficulties[i] *= 1 - h * Math.Pow(hrProportion - 0.5, 2);
 
                         if (ezdtProportion < 0.5)
-                            beatmap.ezdtDifficulties[i] *= 1 - 4 * Math.Pow(ezdtProportion - 0.5, 2);
+                            beatmap.ezdtDifficulties[i] *= 1 - h * Math.Pow(ezdtProportion - 0.5, 2);
                         if (nmdtProportion < 0.5)
-                            beatmap.nmdtDifficulties[i] *= 1 - 4 * Math.Pow(nmdtProportion - 0.5, 2);
+                            beatmap.nmdtDifficulties[i] *= 1 - h * Math.Pow(nmdtProportion - 0.5, 2);
                         if (hrdtProportion < 0.5)
-                            beatmap.hrdtDifficulties[i] *= 1 - 4 * Math.Pow(hrdtProportion - 0.5, 2);
+                            beatmap.hrdtDifficulties[i] *= 1 - h * Math.Pow(hrdtProportion - 0.5, 2);
                     }
 
                     /// Calculates star rating and pp.
