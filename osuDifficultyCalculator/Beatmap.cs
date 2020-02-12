@@ -6,6 +6,8 @@ namespace osuDifficultyCalculator
 {
     public class Beatmap
     {
+        readonly Calculate calculate = new Calculate();
+
         public double circleSize, overallDifficulty, approachRate, sliderTickRate,
             ezhtStarRating, nmhtStarRating, hrhtStarRating,
             ezStarRating, nmStarRating, hrStarRating,
@@ -31,15 +33,13 @@ namespace osuDifficultyCalculator
 
         public struct Note
         {
-            public double xCoordinate, yCoordinate, time, objectType, slideCount, travelDistance;
-            public Note(double x, double y, double t, double o, double s, double tD)
+            public double xCoordinate, yCoordinate, time, realTravelDistance;
+            public Note(double xCoordinate, double yCoordinate, double time, double realTravelDistance)
             {
-                xCoordinate = x;
-                yCoordinate = y;
-                time = t;
-                objectType = o;
-                slideCount = s;
-                travelDistance = tD;
+                this.xCoordinate = xCoordinate;
+                this.yCoordinate = yCoordinate;
+                this.time = time;
+                this.realTravelDistance = realTravelDistance;
             }
         }
 
@@ -56,8 +56,9 @@ namespace osuDifficultyCalculator
                     int yCoordinate = Convert.ToInt32(line.Split(',')[1]);
                     int time = Convert.ToInt32(line.Split(',')[2]);
                     int objectType = Convert.ToInt32(line.Split(',')[3]);
-                    int slideCount = 0;
-                    double travelDistance = 0;
+                    int slideCount;
+                    double travelDistance;
+                    double realTravelDistance = 0;
                     if (objectType != 12)
                     {
                         objectCount++;
@@ -68,9 +69,10 @@ namespace osuDifficultyCalculator
                         else
                         {
                             slideCount = Convert.ToInt32(line.Split(',')[6]);
-                            travelDistance = Math.Max(0, Convert.ToDouble(line.Split(',')[7]));
+                            travelDistance = Convert.ToDouble(line.Split(',')[7]);
+                            realTravelDistance = slideCount * Math.Max(0, travelDistance - 2 * calculate.Diameter(circleSize));
                         }
-                        Note note = new Note(xCoordinate, yCoordinate, time, objectType, slideCount, travelDistance);
+                        Note note = new Note(xCoordinate, yCoordinate, time, realTravelDistance);
                         osuNotes.Add(note);
                     }
                     continue;
