@@ -22,11 +22,11 @@ namespace osuDifficultyCalculator
                     /// Calculate difficulty for every note.
                     for (int i = 1; i < beatmap.osuNotes.Count; i++)
                     {
-                        Beatmap.Note previousPreviousPreviousNote = i - 3 > -1 ? beatmap.osuNotes[i - 3] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.NegativeInfinity, 12, 0, 0);
-                        Beatmap.Note previousPreviousNote = i - 2 > -1 ? beatmap.osuNotes[i - 2] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.MinValue, 12, 0, 0);
-                        Beatmap.Note previousNote = i - 1 > -1 ? beatmap.osuNotes[i - 1] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, int.MinValue, 12, 0, 0);
+                        Beatmap.Note previousPreviousPreviousNote = i - 3 > -1 ? beatmap.osuNotes[i - 3] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.NegativeInfinity, 0);
+                        Beatmap.Note previousPreviousNote = i - 2 > -1 ? beatmap.osuNotes[i - 2] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.MinValue, 0);
+                        Beatmap.Note previousNote = i - 1 > -1 ? beatmap.osuNotes[i - 1] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, int.MinValue, 0);
                         Beatmap.Note currentNote = beatmap.osuNotes[i];
-                        Beatmap.Note nextNote = i + 1 < beatmap.osuNotes.Count ? beatmap.osuNotes[i + 1] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.PositiveInfinity, 12, 0, 0);
+                        Beatmap.Note nextNote = i + 1 < beatmap.osuNotes.Count ? beatmap.osuNotes[i + 1] : new Beatmap.Note(beatmap.osuNotes[i].xCoordinate, beatmap.osuNotes[i].yCoordinate, double.PositiveInfinity, 0);
 
                         double ezhtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, beatmap.circleSize / 2, beatmap.sliderTickRate);
                         double nmhtDifficulty = calculate.Difficulty(previousPreviousPreviousNote, previousPreviousNote, previousNote, currentNote, nextNote, -1, beatmap.circleSize, beatmap.sliderTickRate);
