@@ -30,9 +30,9 @@ namespace osuDifficultyCalculator
         }
 
         /// Calculates the distance between two notes.
-        private double Distance(Beatmap.Note current, Beatmap.Note previous)
+        private double Distance(Beatmap.Note currentNote, Beatmap.Note lastNote)
         {
-            return Math.Sqrt(Math.Pow(current.xCoordinate - previous.xCoordinate, 2) + Math.Pow(current.yCoordinate - previous.yCoordinate, 2));
+            return Math.Sqrt(Math.Pow(currentNote.xCoordinate - lastNote.xCoordinate, 2) + Math.Pow(currentNote.yCoordinate - lastNote.yCoordinate, 2));
         }
 
         ///  Calculate the note density at a note.
@@ -40,9 +40,9 @@ namespace osuDifficultyCalculator
         {
             int noteDensity = 1;
             bool nextNoteIsInvisible = false;
-            double speedUpFactor = 0.125 * Math.Pow(speedUpMod, 2) + 0.375 * speedUpMod + 1;
+            double speedUpFactor = speedUpMod == 0 ? 1.0 : speedUpMod == 1 ? 1.5 : 0.75;
             double approachTime = ConvertApproachRate(approachRate, speedUpMod);
-            for (int i = notePosition; nextNoteIsInvisible == false; i++)
+            for (int i = notePosition; nextNoteIsInvisible == false; ++i)
             {
                 if (i + 1 == osuNotes.Count)
                 {
@@ -64,62 +64,25 @@ namespace osuDifficultyCalculator
         private double ConvertApproachRate(double approachRate, int speedUpMod)
         {
             double approachTime;
-            switch (speedUpMod)
-            {
-                case 1:  /// DT
-                    if (approachRate >= 5)
-                        approachTime = 100 * (13 - approachRate);
-                    else
-                        approachTime = 80 * (15 - approachRate);
-                    break;
-                case 0:  /// NM
-                    if (approachRate >= 5)
-                        approachTime = 150 * (13 - approachRate);
-                    else
-                        approachTime = 120 * (15 - approachRate);
-                    break;
-                case -1: /// HT
-                    if (approachRate >= 5)
-                        approachTime = 200 * (13 - approachRate);
-                    else
-                        approachTime = 160 * (15 - approachRate);
-                    break;
-                default:
-                    approachTime = double.NaN;
-                    break;
-            }
+            double speedUpFactor = speedUpMod == 0 ? 1.0 : speedUpMod == 1 ? 1.5 : 0.75;
+            if (approachRate >= 5)
+                approachTime = 150 / speedUpFactor * (13 - approachRate);
+            else
+                approachTime = 120 / speedUpFactor * (15 - approachRate);
             return approachTime;
         }
 
         /// A multiplicative pp bonus when the FL mod is enabled. The bonus increases as the object count increases.
         /// Minimum bonus is 1.0 at AR 10 or less. Maximum bonus is unbounded.
-        private double FlashlightBonus(List<Beatmap.Note> beatmapObjects, int speedUpMod)
+        private double FlashlightBonus(List<Beatmap.Note> osuNotes, int speedUpMod)
         {
             double flBonus = 0;
             double timeDistanceRatio;
-            switch (speedUpMod)
+            double speedUpFactor = speedUpMod == 0 ? 1.0 : speedUpMod == 1 ? 1.5 : 0.75;
+            for (int i = 1; i < osuNotes.Count; ++i)
             {
-                case 1:  /// DT
-                    for (int i = 1; i < beatmapObjects.Count; ++i)
-                    {
-                        timeDistanceRatio = 1.5 * (Distance(beatmapObjects[i - 1], beatmapObjects[i]) + beatmapObjects[i].realTravelDistance) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[i - 1].time);
-                        flBonus += timeDistanceRatio;
-                    }
-                    break;
-                case 0:  /// NM
-                    for (int i = 1; i < beatmapObjects.Count; ++i)
-                    {
-                        timeDistanceRatio = (Distance(beatmapObjects[i - 1], beatmapObjects[i]) + beatmapObjects[i].realTravelDistance) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[i - 1].time);
-                        flBonus += timeDistanceRatio;
-                    }
-                    break;
-                case -1: /// HT
-                    for (int i = 1; i < beatmapObjects.Count; ++i)
-                    {
-                        timeDistanceRatio = 0.75 * (Distance(beatmapObjects[i - 1], beatmapObjects[i]) + beatmapObjects[i].realTravelDistance) / Math.Max(minimumTime, beatmapObjects[i].time - beatmapObjects[i - 1].time);
-                        flBonus += timeDistanceRatio;
-                    }
-                    break;
+                timeDistanceRatio = speedUpFactor * (Distance(osuNotes[i - 1], osuNotes[i]) + osuNotes[i].realTravelDistance) / Math.Max(minimumTime, osuNotes[i].time - osuNotes[i - 1].time);
+                flBonus += timeDistanceRatio;
             }
             return Math.Pow(1 + Math.Sqrt(flBonus) / 125, 2);
         }
@@ -157,21 +120,8 @@ namespace osuDifficultyCalculator
         private double OverallDifficultyBonus(double overallDifficulty, int speedUpMod)
         {
             double hitWindow;
-            switch (speedUpMod)
-            {
-                case 1:  /// DT
-                    hitWindow = 53 - 4 * overallDifficulty;
-                    break;
-                case 0:  /// NM
-                    hitWindow = 79.5 - 6 * overallDifficulty;
-                    break;
-                case -1: /// HT
-                    hitWindow = 106 - 8 * overallDifficulty;
-                    break;
-                default:
-                    hitWindow = double.NaN;
-                    break;
-            }
+            double speedUpFactor = speedUpMod == 0 ? 1.0 : speedUpMod == 1 ? 1.5 : 0.75;
+            hitWindow = (79.5 - 6 * overallDifficulty) / speedUpFactor;
             return 2 * Math.Pow(2, (19.5 - hitWindow) / 60);
         }
 
@@ -183,65 +133,45 @@ namespace osuDifficultyCalculator
         }
 
         /// Calculates the angle between 3 notes. Return NaN if the angle does not exist.
-        private double Angle(Beatmap.Note previousPrevious, Beatmap.Note previous, Beatmap.Note current)
+        private double Angle(Beatmap.Note secondLastNote, Beatmap.Note lastNote, Beatmap.Note currentNote)
         {
-            double previousToPreviousPrevious = Distance(previous, previousPrevious);
-            double currentToPreviousPrevious = Distance(current, previousPrevious);
-            double currentToPrevious = Distance(current, previous);
-            return currentToPrevious * previousToPreviousPrevious > 0
-                ? Math.Acos((Math.Pow(previousToPreviousPrevious, 2) + Math.Pow(currentToPrevious, 2) - Math.Pow(currentToPreviousPrevious, 2)) / (2 * currentToPrevious * previousToPreviousPrevious))
+            double lastToSecondLast = Distance(lastNote, secondLastNote);
+            double currentToSecondLast = Distance(currentNote, secondLastNote);
+            double currentToLast = Distance(currentNote, lastNote);
+            return currentToLast * lastToSecondLast > 0
+                ? Math.Acos((Math.Pow(lastToSecondLast, 2) + Math.Pow(currentToLast, 2) - Math.Pow(currentToSecondLast, 2)) / (2 * currentToLast * lastToSecondLast))
                 : double.NaN;
         }
 
         /// Buff angle changes.
-        private double AngleChangeBuff(double angle, double previousAngle, double timeDifference, double previousTimeDifference)
+        private double AngleChangeBuff(double angle, double lastAngle, double timeDifference, double lastTimeDifference)
         {
-            previousTimeDifference = Math.Max(minimumTime, previousTimeDifference);
+            lastTimeDifference = Math.Max(minimumTime, lastTimeDifference);
             timeDifference = Math.Max(minimumTime, timeDifference);
-            double timeDifferencePunishment = Math.Pow(3, -Math.Pow(timeDifference - previousTimeDifference, 2) / 1000);
+            double timeDifferencePunishment = Math.Pow(3, -Math.Pow(timeDifference - lastTimeDifference, 2) / 1000);
             double scaledAngle = Math.Pow(Math.Cos(angle / 2), 2);
-            double scaledPreviousAngle = Math.Pow(Math.Cos(previousAngle / 2), 2);
-            double angleDifference = Math.Abs(scaledAngle - scaledPreviousAngle) - 0.1;
-            return double.IsNaN(angle) || double.IsNaN(previousAngle) ? 0 : timeDifferencePunishment * angleDifference;
+            double scaledLastAngle = Math.Pow(Math.Cos(lastAngle / 2), 2);
+            double angleDifference = Math.Abs(scaledAngle - scaledLastAngle) - 0.1;
+            return double.IsNaN(angle) || double.IsNaN(lastAngle) ? 0 : timeDifferencePunishment * angleDifference;
         }
 
         /// Calculates the difficulty of a particular note.
-        public double Difficulty(Beatmap.Note previousPreviousPreviousNote, Beatmap.Note previousPreviousNote, Beatmap.Note previousNote, Beatmap.Note currentNote, Beatmap.Note nextNote, int speedUpMod, double circleSize, double tickRate, bool doPrint = false)
+        public double Difficulty(Beatmap.Note thirdLastNote, Beatmap.Note secondLastNote, Beatmap.Note lastNote, Beatmap.Note currentNote, Beatmap.Note nextNote, int speedUpMod, double circleSize, double tickRate, bool doPrint = false)
         {
-            double currentDistance = Distance(currentNote, previousNote);
-            double overlap = Distance(currentNote, previousNote) / Diameter(circleSize);
+            double currentDistance = Distance(currentNote, lastNote);
+            double overlap = Distance(currentNote, lastNote) / Diameter(circleSize);
             double overlapPunishment = Math.Min(1, Math.Pow(overlap, 2));
-            double angle = Angle(previousPreviousNote, previousNote, currentNote);
-            double previousAngle = Angle(previousPreviousPreviousNote, previousPreviousNote, previousNote);
-            switch (speedUpMod)
-            {
-                case 1:  /// DT
-                    double previousDtTimeDifference = Math.Max(minimumTime, (previousNote.time - previousPreviousNote.time) / 1.5);
-                    double dtTimeDifference = Math.Max(minimumTime, (currentNote.time - previousNote.time) / 1.5);
-                    double dtSpeedBuff = Math.Max(1, 62.5 / dtTimeDifference);
-                    double dtSliderDifficulty = Math.Max(0, tickRate * currentNote.realTravelDistance) / Math.Max(minimumTime, (nextNote.time - currentNote.time) / 1.5);
-                    double baseDtDifficulty = (100 * currentDistance * (1 + dtSliderDifficulty) + currentDistance * (1 + dtSliderDifficulty) * dtTimeDifference) / Math.Pow(dtTimeDifference, 3);
-                    double dtDifficulty = baseDtDifficulty * dtSpeedBuff * (1 + overlapPunishment * AngleChangeBuff(angle, previousAngle, dtTimeDifference, previousDtTimeDifference));
-                    return dtDifficulty;
-                case 0:  /// NM
-                    double previousNmTimeDifference = Math.Max(minimumTime, previousNote.time - previousPreviousNote.time);
-                    double nmTimeDifference = Math.Max(minimumTime, currentNote.time - previousNote.time);
-                    double nmSpeedBuff = Math.Max(1, 62.5 / nmTimeDifference);
-                    double nmSliderDifficulty = Math.Max(0, tickRate * currentNote.realTravelDistance) / Math.Max(minimumTime, nextNote.time - currentNote.time);
-                    double baseNmDifficulty = (100 * currentDistance * (1 + nmSliderDifficulty) + currentDistance * (1 + nmSliderDifficulty) * nmTimeDifference) / Math.Pow(nmTimeDifference, 3);
-                    double nmDifficulty = baseNmDifficulty * nmSpeedBuff * (1 + overlapPunishment * AngleChangeBuff(angle, previousAngle, nmTimeDifference, previousNmTimeDifference));
-                    return nmDifficulty;
-                case -1: /// HT
-                    double previousHtTimeDifference = Math.Max(minimumTime, (previousNote.time - previousPreviousNote.time) / 0.75);
-                    double htTimeDifference = Math.Max(minimumTime, (currentNote.time - previousNote.time) / 0.75);
-                    double htSpeedBuff = Math.Max(1, 62.5 / htTimeDifference);
-                    double htSliderDifficulty = Math.Max(0, tickRate * currentNote.realTravelDistance) / Math.Max(minimumTime, (nextNote.time - currentNote.time) / 0.75);
-                    double baseHtDifficulty = (100 * currentDistance * (1 + htSliderDifficulty) + currentDistance * (1 + htSliderDifficulty) * htTimeDifference) / Math.Pow(htTimeDifference, 3);
-                    double htDifficulty = baseHtDifficulty * htSpeedBuff * (1 + overlapPunishment * AngleChangeBuff(angle, previousAngle, htTimeDifference, previousHtTimeDifference));
-                    return htDifficulty;
-                default:
-                    return 0;
-            }
+            double angle = Angle(secondLastNote, lastNote, currentNote);
+            double lastAngle = Angle(thirdLastNote, secondLastNote, lastNote);
+            double speedUpFactor = speedUpMod == 0 ? 1.0 : speedUpMod == 1 ? 1.5 : 0.75;
+
+            double lastTimeDifference = Math.Max(minimumTime, (lastNote.time - secondLastNote.time) / speedUpFactor);
+            double timeDifference = Math.Max(minimumTime, (currentNote.time - lastNote.time) / speedUpFactor);
+            double speedBuff = Math.Max(1, 62.5 / timeDifference);
+            double sliderDifficulty = 1 + Math.Max(0, tickRate * currentNote.realTravelDistance) / Math.Max(minimumTime, (nextNote.time - currentNote.time) / speedUpFactor);
+            double baseDifficulty = (100 * currentDistance * sliderDifficulty + currentDistance * sliderDifficulty * timeDifference) / Math.Pow(timeDifference, 3);
+            double difficulty = baseDifficulty * speedBuff * (1 + overlapPunishment * AngleChangeBuff(angle, lastAngle, timeDifference, lastTimeDifference));
+            return difficulty;
         }
 
         /// Calculates the star rating of a beatmap.
@@ -265,7 +195,7 @@ namespace osuDifficultyCalculator
                 }
             }
             sectionDifficulties = sectionDifficulties.OrderByDescending(x => x).ToList();
-            for (int i = 0; i < sectionDifficulties.Count; i++)
+            for (int i = 0; i < sectionDifficulties.Count; ++i)
             {
                 sectionDifficulties[i] *= Math.Pow(consistencyMultiplier, i);
             }
