@@ -93,8 +93,8 @@ namespace osuDifficultyCalculator
             double hiddenBonusSum = 0;
             for (int i = 0; i < osuNotes.Count; ++i)
             {
-                int currentNoteDensity = NoteDensity(osuNotes, i, approachRate, speedUpMod);
-                hiddenBonusSum += 1 + 35 * Math.Pow(currentNoteDensity / 100.0, 2);
+                int currentNoteDensity = Math.Min(NoteDensity(osuNotes, i, approachRate, speedUpMod), 26);
+                hiddenBonusSum += 1 + Math.Pow(Math.Sin(Math.PI * currentNoteDensity / 52), 2);
             }
             return hiddenBonusSum / osuNotes.Count;
         }
@@ -158,8 +158,8 @@ namespace osuDifficultyCalculator
         /// Calculates the difficulty of a particular note.
         public double Difficulty(Beatmap.Note thirdLastNote, Beatmap.Note secondLastNote, Beatmap.Note lastNote, Beatmap.Note currentNote, Beatmap.Note nextNote, int speedUpMod, double circleSize, double tickRate, bool doPrint = false)
         {
-            double currentDistance = Distance(currentNote, lastNote);
-            double overlap = Distance(currentNote, lastNote) / Diameter(circleSize);
+            double currentDistance = Distance(currentNote, lastNote) + (10 * Math.Pow(Math.Cos(Math.PI * Math.Min(Distance(currentNote, lastNote), 25) / 50), 1));
+            double overlap = currentDistance / Diameter(circleSize);
             double overlapPunishment = Math.Min(1, Math.Pow(overlap, 2));
             double angle = Angle(secondLastNote, lastNote, currentNote);
             double lastAngle = Angle(thirdLastNote, secondLastNote, lastNote);
