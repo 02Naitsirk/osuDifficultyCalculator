@@ -6,8 +6,6 @@ namespace osuDifficultyCalculator
 {
     public class Beatmap
     {
-        readonly Calculate calculate = new Calculate();
-
         public double circleSize, overallDifficulty, approachRate, sliderTickRate,
             ezhtStarRating, nmhtStarRating, hrhtStarRating,
             ezStarRating, nmStarRating, hrStarRating,
@@ -30,6 +28,11 @@ namespace osuDifficultyCalculator
         public List<double> ezdtDifficulties = new List<double>();
         public List<double> nmdtDifficulties = new List<double>();
         public List<double> hrdtDifficulties = new List<double>();
+
+        private double Diameter(double circleSize)
+        {
+            return 2 * (54.41 - 4.48 * circleSize);
+        }
 
         public struct Note
         {
@@ -70,7 +73,7 @@ namespace osuDifficultyCalculator
                         {
                             slideCount = Convert.ToInt32(line.Split(',')[6]);
                             travelDistance = Convert.ToDouble(line.Split(',')[7]);
-                            realTravelDistance = slideCount * Math.Max(0, travelDistance - 2 * calculate.Diameter(circleSize));
+                            realTravelDistance = slideCount * Math.Max(0, travelDistance - 2 * Diameter(circleSize));
                         }
                         Note note = new Note(xCoordinate, yCoordinate, time, realTravelDistance);
                         osuNotes.Add(note);
