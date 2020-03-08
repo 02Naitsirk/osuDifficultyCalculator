@@ -7,7 +7,7 @@ namespace osuDifficultyCalculator
     public class Calculate
     {
         private const double consistencyMultiplier = 0.98;
-        private const double starRatingMultiplier = 53.0;
+        private const double starRatingMultiplier = 53;
         private const double starRatingExponent = 0.34;
         private const double ppMultiplier = 1.48;
         private const double ppExponent = 2.43;
@@ -132,9 +132,8 @@ namespace osuDifficultyCalculator
         /// Minimum bonus is 1.0 at OD 0; maximum bonus is >2.0 at OD 11. 
         private double OverallDifficultyBonus(double overallDifficulty, int speedUpMod)
         {
-            double hitWindow;
             double speedUpFactor = speedUpMod == 0 ? 1.0 : speedUpMod == 1 ? 1.5 : 0.75;
-            hitWindow = (79.5 - 6 * overallDifficulty) / speedUpFactor;
+            double hitWindow = (79.5 - 6 * overallDifficulty) / speedUpFactor;
             return 2 * Math.Pow(2, (19.5 - hitWindow) / 60);
         }
 
@@ -161,11 +160,11 @@ namespace osuDifficultyCalculator
         {
             lastTimeDifference = Math.Max(minimumTime, lastTimeDifference);
             timeDifference = Math.Max(minimumTime, timeDifference);
-            double timeDifferenceNerf = Math.Pow(3, -Math.Pow(timeDifference - lastTimeDifference, 2) / 1000);
+            double timeDifferenceNerf = Math.Pow(10, -Math.Pow(timeDifference - lastTimeDifference, 2) / 1000);
             double scaledAngle = Math.Pow(Math.Cos(angle / 2), 2);
             double scaledLastAngle = Math.Pow(Math.Cos(lastAngle / 2), 2);
-            double angleDifference = Math.Abs(scaledAngle - scaledLastAngle) - 0.1;
-            return double.IsNaN(angleDifference) ? 0 : timeDifferenceNerf * angleDifference;
+            double angleDifference = Math.Abs(scaledAngle - scaledLastAngle);
+            return double.IsNaN(angleDifference) ? 0 : timeDifferenceNerf * angleDifference / 2;
         }
 
         /// Calculates the difficulty of a particular note.
@@ -180,7 +179,7 @@ namespace osuDifficultyCalculator
 
             double lastTimeDifference = Math.Max(minimumTime, (lastNote.time - secondLastNote.time) / speedUpFactor);
             double timeDifference = Math.Max(minimumTime, (currentNote.time - lastNote.time) / speedUpFactor);
-            double speedBuff = Math.Max(1, 62.5 / timeDifference);
+            double speedBuff = Math.Max(1, 2 - 3 * timeDifference / 200);
             double sliderDifficulty = 1 + Math.Max(0, tickRate * currentNote.realTravelDistance) / Math.Max(minimumTime, (nextNote.time - currentNote.time) / speedUpFactor);
             double baseDifficulty = (100 * currentDistance * sliderDifficulty + currentDistance * sliderDifficulty * timeDifference) / Math.Pow(timeDifference, 3);
             double difficulty = baseDifficulty * speedBuff * (1 + overlapNerf * AngleChangeBuff(angle, lastAngle, timeDifference, lastTimeDifference));
