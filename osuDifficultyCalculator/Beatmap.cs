@@ -9,9 +9,10 @@ namespace osuDifficultyCalculator
         public double circleSize, overallDifficulty, approachRate, sliderTickRate,
             ezhtStarRating, nmhtStarRating, hrhtStarRating,
             ezStarRating, nmStarRating, hrStarRating,
-            ezdtStarRating, nmdtStarRating, hrdtStarRating;
+            ezdtStarRating, nmdtStarRating, hrdtStarRating,
+            circleCount;
 
-        public int circleCount, objectCount;
+        public int objectCount;
 
         public string title, artist, creator, version;
 
@@ -71,6 +72,7 @@ namespace osuDifficultyCalculator
                         }
                         else
                         {
+                            circleCount += 0.25;
                             slideCount = Convert.ToInt32(line.Split(',')[6]);
                             travelDistance = Convert.ToDouble(line.Split(',')[7]);
                             realTravelDistance = slideCount * Math.Max(0, travelDistance - 2 * Diameter(circleSize));
