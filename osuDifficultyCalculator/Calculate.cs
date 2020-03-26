@@ -148,15 +148,15 @@ namespace osuDifficultyCalculator
 
         /// A multiplicative pp bonus for circle count. The bonus increases as the total amount of circles increases.
         /// Minimum bonus is 1.0 at 0 circles; maximum bonus is 3.0 at ∞ circles.
-        private double LengthBonus(int circleCount)
+        private double LengthBonus(double circleCount)
         {
             return 1 + 1.8 * circleCount / (circleCount + 2000);
         }
-        
+
         /// Nerf short maps with object count less than 500 objects.
         private double ShortMapNerf(int objectCount)
         {
-            return 1 - Pow((double) Min(objectCount, 500) / 500 - 1, 2) / 10;
+            return 1 - Pow((double)Min(objectCount, 500) / 500 - 1, 2) / 10;
         }
 
         /// Buff angle changes.
@@ -228,7 +228,7 @@ namespace osuDifficultyCalculator
         }
 
         /// Calculates the pp of a beatmap.
-        public double PP(double starRating, double overallDifficulty, double approachRate, double circleSize, int circleCount, List<Beatmap.Note> osuNotes, int modEnum = 17)
+        public double PP(double starRating, double overallDifficulty, double approachRate, double circleSize, double circleCount, List<Beatmap.Note> osuNotes, int modEnum = 17)
         {
             double basePP = ppMultiplier * Pow(starRating, ppExponent) * LengthBonus(circleCount);
             if (modEnum % (int)Mods.EZ == 0)
